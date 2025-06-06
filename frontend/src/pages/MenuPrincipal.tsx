@@ -1,15 +1,14 @@
 // frontend/src/pages/MenuPrincipal.tsx
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserDataFromToken } from '@/services/authService';
-// Como Card.tsx só possui default export, importamos assim:
+import { getUserDataFromToken, logout } from '@/services/authService';
+// Card tem default export, então importamos desta forma:
 import Card from '@/components/ui/Card';
 
 interface UserData {
   id: number;
   nome: string;
-  papel: 'cliente' | 'funcionario' | 'administrador';
+  role: 'cliente' | 'funcionario' | 'administrador';
 }
 
 export default function MenuPrincipal() {
@@ -17,30 +16,26 @@ export default function MenuPrincipal() {
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const decoded = await getUserDataFromToken(); // retorna DecodedToken | null
-
-      if (decoded) {
-        // assumimos que decoded.papel é uma string compatível
-        const safePapel = decoded.papel as 'cliente' | 'funcionario' | 'administrador';
-
-        setUserData({
-          id: decoded.id,
-          nome: decoded.nome,
-          papel: safePapel,
-        });
-      } else {
-        setUserData(null);
-      }
-    };
-
-    fetchData();
-  }, []);
+    const decoded = getUserDataFromToken(); // retorna DecodedToken | null
+    if (decoded) {
+      // Garante que o valor em decoded.role corresponde a uma das três opções
+      const safeRole = decoded.role as 'cliente' | 'funcionario' | 'administrador';
+      setUserData({
+        id: decoded.id,
+        nome: decoded.nome,
+        role: safeRole,
+      });
+    } else {
+      // Se não houver token ou for inválido, redireciona para login
+      logout();
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const renderMenuItems = () => {
     if (!userData) return null;
 
-    switch (userData.papel) {
+    switch (userData.role) {
       case 'cliente':
         return (
           <>
@@ -73,6 +68,8 @@ export default function MenuPrincipal() {
             <MenuCard label="Perfil" onClick={() => navigate('/perfil')} />
           </>
         );
+      default:
+        return null;
     }
   };
 
@@ -82,6 +79,15 @@ export default function MenuPrincipal() {
         <h1 className="text-2xl font-bold text-[#1b75bb]">
           Bem-vindo, {userData?.nome}
         </h1>
+        <button
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
