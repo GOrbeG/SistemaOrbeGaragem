@@ -4,7 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 require('dotenv').config();
 
-const verificarJWT = require('./middlewares/autenticacaoMiddleware');
+const verificarJWT = require('./middlewares/authMiddleware');
 const app = express();
 
 // Middlewares globais
@@ -12,16 +12,16 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Rotas públicas
+// Rotas públicas (login e registro)
 app.use('/api/auth', require('./routes/authRoutes'));
-pp.use('/api/login', require('./routes/loginRoutes'));
+app.use('/api/login', require('./routes/loginRoutes'));
 
-// Middleware de autenticação para todas as rotas abaixo
+// A partir daqui, qualquer rota abaixo exigirá JWT válido
 app.use(verificarJWT);
 
-// Rotas protegidas
-app.use('/api/clientes', require('./routes/clientesRoutes'));
-app.use('/api/veiculos', require('./routes/veiculosRoutes'));
+// Rotas protegidas (apenas com token válido)
+app.use('/api/clientes', require('./routes/clienteRoutes'));
+app.use('/api/veiculos', require('./routes/veiculoRoutes'));
 app.use('/api/os', require('./routes/osRoutes'));
 app.use('/api/usuarios', require('./routes/usuariosRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
@@ -40,7 +40,7 @@ app.use('/api/tecnicos', require('./routes/tecnicosRoutes'));
 app.use('/api/itens-ordem', require('./routes/itemOrdemRoutes'));
 app.use('/api/agenda', require('./routes/agendaRoutes'));
 
-// Rota raiz
+// Rota raiz apenas para checar se o servidor está vivo
 app.get('/', (req, res) => {
   res.send('API Orbe Garage rodando com sucesso!');
 });
