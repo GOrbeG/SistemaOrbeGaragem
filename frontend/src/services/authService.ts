@@ -5,9 +5,14 @@ import { jwtDecode } from 'jwt-decode';
 const API_URL = '/api'; // ajuste conforme seu backend
 
 // Interface dos dados de autenticação
-interface LoginData {
-  email: string;
-  senha: string;
+interface LoginResponse {
+  token: string;
+  usuario: {
+    id: number;
+    nome: string;
+    email: string;
+    papel: string;
+  };
 }
 
 // Interface dos dados de cadastro
@@ -32,11 +37,15 @@ interface DecodedToken {
 }
 
 // Realiza o login
-export const login = async (cpf: string, senha: string) => {
-  const response = await axios.post(`${API_URL}/login`, { cpf, senha });
-  const token = response.data.token;
-  localStorage.setItem('token', token);
-  return response.data; // deve conter { token, usuario }
+export const login = async (
+  email: string,
+  senha: string
+): Promise<LoginResponse> => {
+  const { data } = await axios.post<LoginResponse>(
+    `${API_URL}/login`,
+    { email, senha }
+  );
+  return data;
 };
 
 // Realiza o cadastro
@@ -45,22 +54,26 @@ export const cadastrar = async (data: CadastroData) => {
   return response.data;
 };
 
-// Retorna o token armazenado
-export const getToken = (): string | null => {
-  return localStorage.getItem('token');
+// Salva token + dados no localStorage
+export const salvarAuth = (token: string, usuario: LoginResponse['usuario']) => {
+  localStorage.setItem('token', token);
+  localStorage.setItem('usuario', JSON.stringify(usuario));
 };
 
-// Decodifica o token para extrair os dados do usuário
-export const getUserDataFromToken = (): DecodedToken | null => {
-  const token = getToken();
+// Lê token do localStorage e retorna o objeto decodificado
+export const getUserDataFromToken = (): {
+  id: number;
+  nome: string;
+  email: string;
+  papel: string;
+} | null => {
+  const token = localStorage.getItem('token');
   if (!token) return null;
 
   try {
-    // Note que agora chamamos jwtDecode, não jwt_decode
-    const decoded = jwtDecode(token) as DecodedToken;
-    return decoded;
-  } catch (error) {
-    console.error('Erro ao decodificar token:', error);
+    return jwtDecode(token);
+  } catch (err) {
+    console.error('Erro ao decodificar token:', err);
     return null;
   }
 };

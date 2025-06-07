@@ -1,7 +1,7 @@
 // src/pages/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '@/services/authService';
+import { login, salvarAuth } from '@/services/authService';
 import logo from '../assets/logo2.png';
 
 export default function Login() {
@@ -13,9 +13,8 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await login(email, senha);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      const { token, usuario } = await login(email, senha);
+      salvarAuth(token, usuario);
       navigate('/menu');
     } catch (err: any) {
       setErro(err.response?.data?.error || 'Erro ao fazer login');
