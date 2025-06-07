@@ -2,11 +2,11 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const db = require('../config/db');
-//const registrarHistorico = require('../middlewares/logHistorico');
-//const checkPermissao = require('../middlewares/checkPermissao');
+const registrarHistorico = require('../middlewares/logHistorico');
+const checkPermissao = require('../middlewares/checkPermissao');
 
 //Listar todos os clientes
-router.get('/', /*checkPermissao(['administrador', 'funcionario']),*/ async (req, res) => {
+router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
   try {
     const result = await db.query('SELECT * FROM clientes');
     res.json(result.rows);
@@ -29,16 +29,16 @@ router.get('/:id', async (req, res) => {
 //Criar novos clientes
 router.post(
   '/',
-  /*checkPermissao(['administrador', 'funcionario']),
+  checkPermissao(['administrador', 'funcionario']),
   [
     body('nome').notEmpty().withMessage('Nome é obrigatório'),
     body('telefone').notEmpty().withMessage('Telefone é obrigatório'),
     body('email').isEmail().withMessage('E-mail inválido'),
     body('endereco').notEmpty().withMessage('Endereço é obrigatório')
-  ],*/
+  ],
   async (req, res) => {
-    //const erros = validationResult(req);
-    //if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
     const { nome, telefone, email, endereco } = req.body;
     try {
@@ -47,13 +47,13 @@ router.post(
         [nome, telefone, email, endereco]
       );
 
-      /*await registrarHistorico({
+      await registrarHistorico({
         usuario_id: req.user.id,
         acao: 'criar',
         entidade: 'clientes',
         entidade_id: result.rows[0].id,
         dados_novos: result.rows[0]
-      });*/
+      });
 
       res.status(201).json(result.rows[0]);
     } catch (error) {
@@ -65,16 +65,16 @@ router.post(
 //Atualizar cliente
 router.put(
   '/:id',
-  /*checkPermissao(['administrador', 'funcionario']),
+  checkPermissao(['administrador', 'funcionario']),
   [
     body('nome').notEmpty().withMessage('Nome é obrigatório'),
     body('telefone').notEmpty().withMessage('Telefone é obrigatório'),
     body('email').isEmail().withMessage('E-mail inválido'),
     body('endereco').notEmpty().withMessage('Endereço é obrigatório')
-  ],*/
+  ],
   async (req, res) => {
-    //const erros = validationResult(req);
-    //if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
     const { nome, telefone, email, endereco } = req.body;
     try {
@@ -91,14 +91,14 @@ router.put(
       if (result.rows.length === 0) return res.status(404).json({ error: 'Cliente não encontrado para atualizar' });
       
       // ✅ PASSO 3: Use a variável correta que você acabou de buscar
-      /*await registrarHistorico({
+      await registrarHistorico({
         usuario_id: req.user.id,
         acao: 'atualizar',
         entidade: 'clientes',
         entidade_id: req.params.id,
         dados_anteriores: clienteAntes.rows[0], // Agora "clienteAntes" existe!
         dados_novos: result.rows[0]
-      });*/
+      });
 
       res.json(result.rows[0]);
     } catch (error) {
@@ -109,7 +109,7 @@ router.put(
 );
 
 //Deletar CLiente
-router.delete('/:id', /*checkPermissao(['administrador', 'funcionario']),*/ async (req, res) => {
+router.delete('/:id', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
   try {
     const clienteAntes = await db.query('SELECT * FROM clientes WHERE id = $1', [req.params.id]);
     if (clienteAntes.rows.length === 0) {
@@ -119,13 +119,13 @@ router.delete('/:id', /*checkPermissao(['administrador', 'funcionario']),*/ asyn
     await db.query('DELETE FROM clientes WHERE id = $1', [req.params.id]);
     
     // ✅ PASSO 3: Use a variável correta para o histórico
-    /*await registrarHistorico({
+    await registrarHistorico({
       usuario_id: req.user.id,
       acao: 'deletar',
       entidade: 'clientes',
       entidade_id: req.params.id,
       dados_anteriores: clienteAntes.rows[0] // Agora "clienteAntes" existe!
-    });*/
+    });
     
     res.json({ mensagem: 'Cliente deletado com sucesso' });
   } catch (error) {
