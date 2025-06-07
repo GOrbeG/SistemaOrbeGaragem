@@ -78,44 +78,62 @@ router.put(
 
     const { nome, telefone, email, endereco } = req.body;
     try {
+      // ✅ PASSO 1: ANTES de atualizar, busque o estado atual do cliente
+      const clienteAntes = await db.query('SELECT * FROM clientes WHERE id = $1', [req.params.id]);
+      if (clienteAntes.rows.length === 0) {
+        return res.status(404).json({ error: 'Cliente não encontrado para buscar dados antigos' });
+      }
+
+      // PASSO 2: Agora sim, faça o UPDATE
       const result = await db.query(
         'UPDATE clientes SET nome = $1, telefone = $2, email = $3, endereco = $4 WHERE id = $5 RETURNING *',
         [nome, telefone, email, endereco, req.params.id]
       );
-      if (result.rows.length === 0) return res.status(404).json({ error: 'Cliente não encontrado' });
+      if (result.rows.length === 0) return res.status(404).json({ error: 'Cliente não encontrado para atualizar' });
       
+      // ✅ PASSO 3: Use a variável correta que você acabou de buscar
       await registrarHistorico({
         usuario_id: req.user.id,
         acao: 'atualizar',
         entidade: 'clientes',
         entidade_id: req.params.id,
-        dados_anteriores: clienteAntes.rows[0],
+        dados_anteriores: clienteAntes.rows[0], // Agora "clienteAntes" existe!
         dados_novos: result.rows[0]
       });
 
       res.json(result.rows[0]);
     } catch (error) {
+      console.error("Erro ao atualizar cliente:", error); // Adicione um log para ver o erro
       res.status(500).json({ error: 'Erro ao atualizar cliente' });
     }
   }
 );
 
 //Deletar CLiente
+//Deletar CLiente
 router.delete('/:id', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
   try {
-    const result = await db.query('DELETE FROM clientes WHERE id = $1 RETURNING *', [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Cliente não encontrado' });
+    // ✅ PASSO 1: ANTES de deletar, busque os dados que serão apagados
+    const clienteAntes = await db.query('SELECT * FROM clientes WHERE id = $1', [req.params.id]);
+    if (clienteAntes.rows.length === 0) {
+      return res.status(404).json({ error: 'Cliente não encontrado para deletar' });
+    }
+
+    // PASSO 2: Agora sim, delete o cliente
+    await db.query('DELETE FROM clientes WHERE id = $1', [req.params.id]);
     
+    // ✅ PASSO 3: Use a variável correta para o histórico
     await registrarHistorico({
       usuario_id: req.user.id,
       acao: 'deletar',
       entidade: 'clientes',
       entidade_id: req.params.id,
-      dados_anteriores: clienteAntes.rows[0]
+      dados_anteriores: clienteAntes.rows[0] // Agora "clienteAntes" existe!
     });
     
     res.json({ mensagem: 'Cliente deletado com sucesso' });
   } catch (error) {
+    console.error("Erro ao deletar cliente:", error); // Adicione um log para ver o erro
     res.status(500).json({ error: 'Erro ao deletar cliente' });
   }
 });
