@@ -41,7 +41,7 @@ export default function Login() {
           )}
 
           <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-white mb-1">Email</label>
+            <label className="block text-sm text-[#ffffff] mb-1">Email</label>
             <input
               type="email"
               value={email}
@@ -53,13 +53,13 @@ export default function Login() {
           </div>
 
           <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-white mb-1">Senha</label>
+            <label className="block text-sm text-[#ffffff] mb-1">Senha</label>
             <input
               type="password"
               value={senha}
               onChange={e => setSenha(e.target.value)}
               placeholder="senha"
-              className="w-60 h-9 px-3 bg-white rounded focus:outline-none"
+              className="w-60 h-9 px-3 bg-[#ffffff] rounded focus:outline-none"
               required
             />
           </div>
@@ -67,7 +67,7 @@ export default function Login() {
           {/* Botão centralizado via mx-auto */}
           <button
             type="submit"
-            className="w-40 h-9 bg-[#1b75bb] text-white font-medium rounded mx-auto"
+            className="w-40 h-3 bg-[#1b75bb] text-white font-medium rounded mx-auto"
           >
             Entrar
           </button>
