@@ -11,6 +11,10 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
+// Rotas públicas (login e registro)
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/login', require('./routes/loginRoutes'));
+
 // Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
   res.send('Servidor de teste mínimo está no ar!');
