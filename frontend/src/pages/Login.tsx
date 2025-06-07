@@ -60,7 +60,8 @@ export default function Login() {
               required
             />
           </div>
-
+          
+          <div className="w-full flex justify-center"></div>
           <button
             type="submit"
             className="w-40 h-4 bg-[#e1edf7] text-white font-medium rounded mx-auto"
@@ -69,7 +70,7 @@ export default function Login() {
           </button>
 
           <p className="text-center">
-            <Link to="/register" className="text-[#1b75bb]">
+            <Link to="/Cadastro" className="text-[#1b75bb]">
               cadastrar
             </Link>
           </p>
