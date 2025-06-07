@@ -44,7 +44,7 @@ export default function Login() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="email"
-              className="w-full h-5 px-2 bg-white rounded focus:outline-none"
+              className="w-56 h-5 px-2 bg-white rounded focus:outline-none"
               required
             />
           </div>
@@ -56,14 +56,14 @@ export default function Login() {
               value={senha}
               onChange={e => setSenha(e.target.value)}
               placeholder="senha"
-              className="w-full h-5 px-2 bg-white rounded focus:outline-none"
+              className="w-56 h-5 px-2 bg-white rounded focus:outline-none"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full h-3 bg-[#1b75bb] text-white font-medium rounded"
+            className="w-40 h-3 bg-[#1b75bb] text-white font-medium rounded"
           >
             Entrar
           </button>
