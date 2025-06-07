@@ -28,7 +28,7 @@ export default function Login() {
         {/* Logo e Título */}
         <div className="flex flex-col items-center mb-6">
           <img src={logo} alt="Logo Orbe Garage" className="h-24 mb-4" />
-          <h2 className="text-3xl font-semibold text-[#ffffff]">Login</h2>
+          <h2 className="text-3xl font-montserrat text-[#ffffff]">Login</h2>
         </div>
 
         {/* Formulário sem card branco */}
@@ -44,7 +44,7 @@ export default function Login() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="email"
-              className="w-56 h-5 px-2 bg-[#ffffff] rounded focus:outline-none"
+              className="w-60 h-6 px-4 bg-[#ffffff] rounded focus:outline-none"
               required
             />
           </div>
@@ -56,15 +56,14 @@ export default function Login() {
               value={senha}
               onChange={e => setSenha(e.target.value)}
               placeholder="senha"
-              className="w-56 h-5 px-2 bg-[#ffffff] rounded focus:outline-none"
+              className="w-60 h-6 px-4 bg-[#ffffff] rounded focus:outline-none"
               required
             />
           </div>
           
-          <div className="w-full flex justify-center"></div>
           <button
             type="submit"
-            className="w-40 h-4 bg-[#e1edf7] text-white font-medium rounded mx-auto"
+            className="w-40 h-9 bg-[#1b75bb] text-white font-medium rounded self-center"
           >
             Entrar
           </button>
