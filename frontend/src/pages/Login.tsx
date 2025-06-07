@@ -25,7 +25,7 @@ export default function Login() {
   return (
     <div className="flex h-screen items-center justify-center bg-[#2e2e2e]">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-[#1b75bb] text-center">Login</h2>
+        <h2 className="text-2xl font-bold mb-6 text-[#ffffff] text-center">Login</h2>
         {erro && <p className="text-red-600 mb-4 text-center">{erro}</p>}
 
         <div className="mb-4">
@@ -34,7 +34,7 @@ export default function Login() {
             type="text"
             value={email}
             onChange={(e) => setCpf(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-2 border border-gray-200 rounded mt-1"
             required
           />
         </div>
@@ -45,7 +45,7 @@ export default function Login() {
             type="password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-2 border border-gray-200 rounded mt-1"
             required
           />
         </div>
