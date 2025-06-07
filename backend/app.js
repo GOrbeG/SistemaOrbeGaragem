@@ -45,4 +45,16 @@ app.get('/', (req, res) => {
   res.send('API Orbe Garage rodando com sucesso!');
 });
 
+// app.js, abaixo de app.get('/', …)
+const pool = require('./db');
+app.get('/api/test-db', async (_req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT NOW()');
+    res.json({ agora: rows[0].now });
+  } catch (err) {
+    console.error('❌ Falha ao testar DB:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = app;
