@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = 'http://localhost:3000/api'; // ajuste conforme seu backend
+const API_URL = '/api'; // ajuste conforme seu backend
 
 // Interface dos dados de autenticação
 interface LoginData {
