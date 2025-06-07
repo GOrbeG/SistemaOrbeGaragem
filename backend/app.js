@@ -17,9 +17,10 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
 
 // A partir daqui, qualquer rota abaixo exigirá JWT válido
-
+pp.use(verificarJWT);
 
 // Rotas protegidas (apenas com token válido)
+app.use('/api/clientes', require('./routes/clienteRoutes'));
 
 // Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
