@@ -4,16 +4,16 @@ import { jwtDecode } from 'jwt-decode';
 
 const API_URL = '/api'; // ajuste conforme seu backend
 
-// Interface dos dados de autenticação
-interface LoginResponse {
+// Interface dos dados retornados pelo login
+type LoginResponse = {
   token: string;
   usuario: {
     id: number;
     nome: string;
     email: string;
-    papel: string;
+    papel: 'cliente' | 'funcionario' | 'administrador';
   };
-}
+};
 
 // Interface dos dados de cadastro
 interface CadastroData {
@@ -36,7 +36,7 @@ interface DecodedToken {
   exp: number;
 }
 
-// Realiza o login
+// Faz login e retorna o token + usuário
 export const login = async (
   email: string,
   senha: string
@@ -48,6 +48,11 @@ export const login = async (
   return data;
 };
 
+// Lê token salvo e retorna ou null
+export const getToken = (): string | null => {
+  return localStorage.getItem('token');
+};
+
 // Realiza o cadastro
 export const cadastrar = async (data: CadastroData) => {
   const response = await axios.post(`${API_URL}/usuarios`, data);
@@ -55,23 +60,25 @@ export const cadastrar = async (data: CadastroData) => {
 };
 
 // Salva token + dados no localStorage
-export const salvarAuth = (token: string, usuario: LoginResponse['usuario']) => {
-  localStorage.setItem('token', token);
-  localStorage.setItem('usuario', JSON.stringify(usuario));
+enum StorageKey {
+  TOKEN = 'token',
+  USUARIO = 'usuario'
+}
+export const salvarAuth = (
+  token: string,
+  usuario: LoginResponse['usuario']
+): void => {
+  localStorage.setItem(StorageKey.TOKEN, token);
+  localStorage.setItem(StorageKey.USUARIO, JSON.stringify(usuario));
 };
 
-// Lê token do localStorage e retorna o objeto decodificado
-export const getUserDataFromToken = (): {
-  id: number;
-  nome: string;
-  email: string;
-  papel: string;
-} | null => {
-  const token = localStorage.getItem('token');
+// Lê token e retorna o objeto decodificado ou null
+export const getUserDataFromToken = (): LoginResponse['usuario'] | null => {
+  const token = getToken();
   if (!token) return null;
 
   try {
-    return jwtDecode(token);
+    return jwtDecode<LoginResponse['usuario']>(token);
   } catch (err) {
     console.error('Erro ao decodificar token:', err);
     return null;
