@@ -70,7 +70,7 @@ export default function Login() {
           </button>
 
           <p className="text-center">
-            <Link to="/Cadastro" className="text-[#1b75bb]">
+            <Link to="/Cadastro" className="text-[#1b75bb] hover:underline">
               cadastrar
             </Link>
           </p>

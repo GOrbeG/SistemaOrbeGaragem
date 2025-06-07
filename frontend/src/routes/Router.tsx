@@ -1,9 +1,8 @@
 // src/routes/Router.tsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import SplashScreen from '../pages/SplashScreen';
 import Login from '../pages/Login';
-
+import Cadastro from '../pages/Cadastro';
 import PrivateRoute from '../components/PrivateRoute';
 
 // Crie (ou importe) as páginas protegidas—por enquanto, apenas placeholders
@@ -17,11 +16,12 @@ import Perfil from '../pages/Perfil';
 
 export default function AppRoutes() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
         {/* Rota pública */}
         <Route path="/" element={<SplashScreen />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<Cadastro />} />
 
         {/** ROTAS PROTEGIDAS **/}
         {/* Se o usuário não estiver logado, vai para /login */}
@@ -88,6 +88,6 @@ export default function AppRoutes() {
           }
         />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
