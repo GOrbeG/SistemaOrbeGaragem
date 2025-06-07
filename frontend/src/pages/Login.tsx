@@ -63,7 +63,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-40 h-3 bg-[#e1edf7] text-center font-medium rounded items-center"
+            className="w-40 h-4 bg-[#e1edf7] text-center font-medium rounded mx-auto"
           >
             Entrar
           </button>
