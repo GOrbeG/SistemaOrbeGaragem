@@ -32,38 +32,42 @@ export default function Login() {
         </div>
 
         {/* Formulário sem card branco */}
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form
+          onSubmit={handleLogin}
+          className="w-full flex flex-col items-center space-y-4"
+        >
           {erro && (
             <p className="text-red-500 text-center text-sm">{erro}</p>
           )}
 
           <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-[#ffffff] mb-1">Email</label>
+            <label className="block text-sm text-white mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="email"
-              className="w-60 h-6 px-4 bg-[#ffffff] rounded focus:outline-none"
+              className="w-60 h-9 px-3 bg-white rounded focus:outline-none"
               required
             />
           </div>
 
           <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-[#ffffff] mb-1">Senha</label>
+            <label className="block text-sm text-white mb-1">Senha</label>
             <input
               type="password"
               value={senha}
               onChange={e => setSenha(e.target.value)}
               placeholder="senha"
-              className="w-60 h-6 px-4 bg-[#ffffff] rounded focus:outline-none"
+              className="w-60 h-9 px-3 bg-white rounded focus:outline-none"
               required
             />
           </div>
-          
+
+          {/* Botão centralizado via mx-auto */}
           <button
             type="submit"
-            className="w-40 h-9 bg-[#1b75bb] text-white font-medium rounded rounded"
+            className="w-40 h-9 bg-[#1b75bb] text-white font-medium rounded mx-auto"
           >
             Entrar
           </button>
