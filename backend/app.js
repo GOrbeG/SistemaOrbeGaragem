@@ -17,7 +17,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
 
 // A partir daqui, qualquer rota abaixo exigirá JWT válido
-pp.use(verificarJWT);
+app.use(verificarJWT);
 
 // Rotas protegidas (apenas com token válido)
 app.use('/api/clientes', require('./routes/clienteRoutes'));
