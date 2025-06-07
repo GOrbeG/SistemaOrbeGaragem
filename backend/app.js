@@ -46,7 +46,7 @@ app.get('/', (req, res) => {
 });
 
 // app.js, abaixo de app.get('/', …)
-const pool = require('./db');
+const pool = require('./config/db');
 app.get('/api/test-db', async (_req, res) => {
   try {
     const { rows } = await pool.query('SELECT NOW()');
