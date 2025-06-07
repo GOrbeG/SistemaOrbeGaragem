@@ -1,8 +1,15 @@
 // backend/app.js - VERSÃO DE TESTE MÍNIMA
 const express = require('express');
 const pool = require('./config/db'); // Verifique se este caminho está correto
-
+const cors = require('cors');
+const morgan = require('morgan');
+require('dotenv').config();
 const app = express();
+
+// Middlewares globais
+app.use(cors());
+app.use(express.json());
+app.use(morgan('dev'));
 
 // Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
