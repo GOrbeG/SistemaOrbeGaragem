@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import InputMask from 'react-input-mask';
 
 interface FormData {
   nome: string;
@@ -57,55 +56,87 @@ export default function Cadastro() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1b75bb]">
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded shadow-md w-full max-w-md space-y-4">
-        <h2 className="text-2xl font-semibold text-center text-[#2e2e2e]">Cadastro</h2>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white p-8 rounded shadow-md w-full max-w-md space-y-4"
+      >
+        <h2 className="text-2xl font-semibold text-center text-[#2e2e2e]">
+          Cadastro
+        </h2>
 
-        <input
-          {...register('nome', { required: 'Nome é obrigatório' })}
-          placeholder="Nome"
-          className="w-full border p-2 rounded"
-        />
-        {errors.nome && <p className="text-red-500 text-sm">{errors.nome.message}</p>}
+        <div>
+          <input
+            {...register('nome', { required: 'Nome é obrigatório' })}
+            placeholder="Nome"
+            className="w-full border p-2 rounded"
+          />
+          {errors.nome && (
+            <p className="text-red-500 text-sm">{errors.nome.message}</p>
+          )}
+        </div>
 
-        <input
-          {...register('email', { required: 'Email é obrigatório' })}
-          placeholder="Email"
-          type="email"
-          className="w-full border p-2 rounded"
-        />
-        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+        <div>
+          <input
+            {...register('email', { required: 'Email é obrigatório' })}
+            placeholder="Email"
+            type="email"
+            className="w-full border p-2 rounded"
+          />
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email.message}</p>
+          )}
+        </div>
 
-        <input
-          {...register('senha', { required: 'Senha é obrigatória' })}
-          placeholder="Senha"
-          type="password"
-          className="w-full border p-2 rounded"
-        />
-        {errors.senha && <p className="text-red-500 text-sm">{errors.senha.message}</p>}
+        <div>
+          <input
+            {...register('senha', { required: 'Senha é obrigatória' })}
+            placeholder="Senha"
+            type="password"
+            className="w-full border p-2 rounded"
+          />
+          {errors.senha && (
+            <p className="text-red-500 text-sm">{errors.senha.message}</p>
+          )}
+        </div>
 
-        <InputMask
-          {...register('cpf', { required: 'CPF é obrigatório' })}
-          mask="999.999.999-99"
-          placeholder="CPF"
-          className="w-full border p-2 rounded"
-        />
-        {errors.cpf && <p className="text-red-500 text-sm">{errors.cpf.message}</p>}
+        <div>
+          <input
+            {...register('cpf', { required: 'CPF é obrigatório' })}
+            placeholder="CPF (000.000.000-00)"
+            className="w-full border p-2 rounded"
+          />
+          {errors.cpf && (
+            <p className="text-red-500 text-sm">{errors.cpf.message}</p>
+          )}
+        </div>
 
-        <select {...register('papel', { required: 'Selecione o papel' })} className="w-full border p-2 rounded">
-          <option value="">Selecione o papel</option>
-          <option value="cliente">Cliente</option>
-          <option value="funcionario">Funcionário</option>
-        </select>
-        {errors.papel && <p className="text-red-500 text-sm">{errors.papel.message}</p>}
+        <div>
+          <select
+            {...register('papel', { required: 'Selecione o papel' })}
+            className="w-full border p-2 rounded"
+          >
+            <option value="">Selecione o papel</option>
+            <option value="cliente">Cliente</option>
+            <option value="funcionario">Funcionário</option>
+          </select>
+          {errors.papel && (
+            <p className="text-red-500 text-sm">{errors.papel.message}</p>
+          )}
+        </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setFoto(e.target.files?.[0] || null)}
-          className="w-full border p-2 rounded"
-        />
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setFoto(e.target.files?.[0] || null)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
 
-        <button type="submit" className="w-full bg-[#1b75bb] text-white p-2 rounded hover:bg-[#2e2e2e]">
+        <button
+          type="submit"
+          className="w-full bg-[#1b75bb] text-white p-2 rounded hover:bg-[#2e2e2e]"
+        >
           Cadastrar
         </button>
       </form>
