@@ -1,11 +1,11 @@
 // src/pages/Login.tsx
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { login } from '@/services/authService';
-
+import logo from '../assets/logo2.png';
 
 export default function Login() {
-  const [email, setCpf] = useState('');
+  const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
@@ -24,39 +24,53 @@ export default function Login() {
 
   return (
     <div className="flex h-screen items-center justify-center bg-[#2e2e2e]">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-[#ffffff] text-center">Login</h2>
-        {erro && <p className="text-red-600 mb-4 text-center">{erro}</p>}
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700">Email</label>
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setCpf(e.target.value)}
-            className="w-full p-2 border border-gray-200 rounded mt-1"
-            required
-          />
+      <div className="w-full max-w-sm px-4">
+        {/* Logo e título */}
+        <div className="flex flex-col items-center mb-8">
+          <img src={logo} alt="Logo Orbe Garage" className="h-20 mb-4" />
+          <h2 className="text-4xl font-semibold text-white">Login</h2>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm text-gray-700">Senha</label>
-          <input
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            className="w-full p-2 border border-gray-200 rounded mt-1"
-            required
-          />
-        </div>
+        {/* Formulário */}
+        <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-lg">
+          {erro && <p className="text-red-600 mb-4 text-center">{erro}</p>}
 
-        <button
-          type="submit"
-          className="w-full bg-[#1b75bb] text-white p-2 rounded hover:bg-[#5a9ec9] transition"
-        >
-          Entrar
-        </button>
-      </form>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full mt-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700">Senha</label>
+            <input
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              className="w-full mt-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-white text-[#1b75bb] font-medium py-2 rounded-full hover:bg-gray-100 transition"
+          >
+            Entrar
+          </button>
+
+          <p className="mt-4 text-center">
+            <Link to="/register" className="text-blue-400 hover:underline">
+              cadastrar
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
