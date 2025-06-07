@@ -20,7 +20,6 @@ app.use('/api/login', require('./routes/loginRoutes'));
 app.use(verificarJWT);
 
 // Rotas protegidas (apenas com token válido)
-app.use('/api/clientes', require('./routes/clienteRoutes'));
 
 // Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
