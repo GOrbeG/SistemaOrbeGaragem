@@ -16,6 +16,7 @@ app.use(morgan('dev'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
 app.use('/api/os', require('./routes/osRoutes'));
+app.use('/api/usuarios', require('./routes/usuariosRoutes'));
 
 // A partir daqui, qualquer rota abaixo exigirá JWT válido
 app.use(verificarJWT());
