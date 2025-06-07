@@ -36,7 +36,7 @@ export default function Login() {
           {erro && <p className="text-red-600 mb-4 text-center">{erro}</p>}
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-300">Email</label>
             <input
               type="email"
               value={email}
@@ -47,7 +47,7 @@ export default function Login() {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700">Senha</label>
+            <label className="block text-sm font-medium text-gray-300">Senha</label>
             <input
               type="password"
               value={senha}
