@@ -37,6 +37,8 @@ app.use('/api/checklist-confirmacao', require('./routes/checklistConfirmacaoRout
 app.use('/api/assinaturas', require('./routes/assinaturaRoutes'));
 app.use('/api/relatorios', require('./routes/relatoriosRoutes'));
 app.use('/api/tecnicos', require('./routes/tecnicosRoutes'));
+app.use('/api/itens-ordem', require('./routes/itemOrdemRoutes'));
+app.use('/api/agenda', require('./routes/agendaRoutes'));
 
 // Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
