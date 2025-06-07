@@ -23,13 +23,13 @@ export default function Login() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-[#d1d1d1]">
+    <div className="flex h-screen items-center justify-center bg-[#2e2e2e]">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-[#1b75bb] text-center">Login - Orbe Garage</h2>
+        <h2 className="text-2xl font-bold mb-6 text-[#1b75bb] text-center">Login</h2>
         {erro && <p className="text-red-600 mb-4 text-center">{erro}</p>}
 
         <div className="mb-4">
-          <label className="block text-sm text-gray-700">CPF</label>
+          <label className="block text-sm text-gray-700">Email</label>
           <input
             type="text"
             value={email}
