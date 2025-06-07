@@ -23,7 +23,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#2e2e2e] px-4">
+    <div className="flex items-center justify-center w-screen min-h-screen bg-[#2e2e2e]">
       <div className="w-full max-w-xs">
         {/* Logo e Título */}
         <div className="flex flex-col items-center mb-6">
@@ -63,7 +63,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-40 h-4 bg-[#e1edf7] text-center font-medium rounded mx-auto"
+            className="w-40 h-4 bg-[#e1edf7] text-white font-medium rounded mx-auto"
           >
             Entrar
           </button>

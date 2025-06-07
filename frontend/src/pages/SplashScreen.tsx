@@ -16,7 +16,7 @@ export default function SplashScreen() {
   }, [navigate]);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#053255] to-[#1b75bb]">
+    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#053255] to-[#053255]">
       <motion.img
         src={logo}
         alt="Logo Orbe Garage"
