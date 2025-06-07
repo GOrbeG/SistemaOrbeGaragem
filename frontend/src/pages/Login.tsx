@@ -23,59 +23,53 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
-      <div className="w-full max-w-md">
-        {/* Logo e título */}
+    <div className="flex items-center justify-center min-h-screen bg-[#2e2e2e] px-4">
+      <div className="w-full max-w-xs">
+        {/* Logo e Título */}
         <div className="flex flex-col items-center mb-6">
-          <img src={logo} alt="Logo Orbe Garage" className="h-16 mb-2" />
+          <img src={logo} alt="Logo Orbe Garage" className="h-24 mb-4" />
           <h2 className="text-3xl font-semibold text-white">Login</h2>
         </div>
 
-        {/* Formulário */}
-        <form
-          onSubmit={handleLogin}
-          className="bg-gray-800 px-6 py-6 rounded-lg shadow-md space-y-4"
-        >
+        {/* Formulário sem card branco */}
+        <form onSubmit={handleLogin} className="space-y-4">
           {erro && (
-            <p className="text-red-500 text-sm text-center">{erro}</p>
+            <p className="text-red-500 text-center text-sm">{erro}</p>
           )}
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Email</label>
+            <label className="block text-sm text-white mb-1">Email</label>
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="seu@email.com"
+              onChange={e => setEmail(e.target.value)}
+              placeholder="email"
+              className="w-full h-9 px-2 bg-white rounded focus:outline-none"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Senha</label>
+            <label className="block text-sm text-white mb-1">Senha</label>
             <input
               type="password"
               value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
+              onChange={e => setSenha(e.target.value)}
+              placeholder="senha"
+              className="w-full h-9 px-2 bg-white rounded focus:outline-none"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600 transition"
+            className="w-full h-9 bg-[#1b75bb] text-white font-medium rounded"
           >
             Entrar
           </button>
 
-          <p className="text-center text-sm">
-            <Link
-              to="/register"
-              className="text-blue-400 hover:underline"
-            >
+          <p className="text-center">
+            <Link to="/register" className="text-[#1b75bb]">
               cadastrar
             </Link>
           </p>
