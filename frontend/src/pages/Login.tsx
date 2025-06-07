@@ -38,7 +38,7 @@ export default function Login() {
           )}
 
           <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-white mb-1">Email</label>
+            <label className="block text-sm text-[#ffffff] mb-1">Email</label>
             <input
               type="email"
               value={email}
@@ -50,7 +50,7 @@ export default function Login() {
           </div>
 
           <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-white mb-1">Senha</label>
+            <label className="block text-sm text-[#ffffff] mb-1">Senha</label>
             <input
               type="password"
               value={senha}
@@ -63,7 +63,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-40 h-3 bg-[#e1edf7] text-center font-medium rounded"
+            className="w-40 h-3 bg-[#e1edf7] text-center font-medium rounded items-center"
           >
             Entrar
           </button>
