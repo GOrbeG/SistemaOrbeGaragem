@@ -19,6 +19,8 @@ app.use('/api/os', require('./routes/osRoutes'));
 app.use('/api/usuarios', require('./routes/usuariosRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/historico', require('./routes/historicoRoutes'));
+app.use('/api/agendamentos', require('./routes/agendamentosRoutes'));
+app.use('/api/comentarios', require('./routes/comentariosRoutes'));
 
 // A partir daqui, qualquer rota abaixo exigirá JWT válido
 app.use(verificarJWT());
