@@ -1,59 +1,43 @@
-// backend/app.js
+// backend/app.js - VERSÃO DE TESTE MÍNIMA
 const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-require('dotenv').config();
+const pool = require('./config/db'); // Verifique se este caminho está correto
 
-const verificarJWT = require('./middlewares/authMiddleware');
 const app = express();
 
-// Middlewares globais
-app.use(cors());
-app.use(express.json());
-app.use(morgan('dev'));
-
-// Rotas públicas (login e registro)
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/login', require('./routes/loginRoutes'));
-
-// A partir daqui, qualquer rota abaixo exigirá JWT válido
-app.use(verificarJWT);
-
-// Rotas protegidas (apenas com token válido)
-app.use('/api/clientes', require('./routes/clienteRoutes'));
-app.use('/api/veiculos', require('./routes/veiculoRoutes'));
-app.use('/api/os', require('./routes/osRoutes'));
-app.use('/api/usuarios', require('./routes/usuariosRoutes'));
-app.use('/api/dashboard', require('./routes/dashboardRoutes'));
-app.use('/api/historico', require('./routes/historicoRoutes'));
-app.use('/api/agendamentos', require('./routes/agendamentosRoutes'));
-app.use('/api/comentarios', require('./routes/comentariosRoutes'));
-app.use('/api/financeiro', require('./routes/financeiroRoutes'));
-app.use('/api/favoritos', require('./routes/favoritosRoutes'));
-app.use('/api/upload', require('./routes/uploadRoutes'));
-app.use('/api/notificacoes', require('./routes/notificacoesRoutes'));
-app.use('/api/checklist', require('./routes/checklistRoutes'));
-app.use('/api/checklist-confirmacao', require('./routes/checklistConfirmacaoRoutes'));
-app.use('/api/assinaturas', require('./routes/assinaturaRoutes'));
-app.use('/api/relatorios', require('./routes/relatoriosRoutes'));
-app.use('/api/tecnicos', require('./routes/tecnicosRoutes'));
-app.use('/api/itens-ordem', require('./routes/itemOrdemRoutes'));
-app.use('/api/agenda', require('./routes/agendaRoutes'));
-
-// Rota raiz apenas para checar se o servidor está vivo
+// Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
-  res.send('API Orbe Garage rodando com sucesso!');
+  res.send('Servidor de teste mínimo está no ar!');
 });
 
-// app.js, abaixo de app.get('/', …)
-const pool = require('./config/db');
-app.get('/api/test-db', async (_req, res) => {
+// Rota de teste do banco de dados com LOGS DETALHADOS
+app.get('/api/test-db', async (req, res) => {
+  console.log('➡️  [Passo 1] Recebi uma requisição em /api/test-db.');
+  let client;
+
   try {
-    const { rows } = await pool.query('SELECT NOW()');
-    res.json({ agora: rows[0].now });
+    console.log('➡️  [Passo 2] Tentando obter uma conexão do pool...');
+    client = await pool.connect(); // Tenta pegar uma conexão
+    console.log('✅  [Passo 3] Conexão do pool obtida com sucesso!');
+
+    const result = await client.query('SELECT NOW()');
+    console.log('✅  [Passo 4] Query executada com sucesso!');
+
+    res.json({ agora: result.rows[0].now });
+
   } catch (err) {
-    console.error('❌ Falha ao testar DB:', err);
-    res.status(500).json({ error: err.message });
+    console.error('❌❌❌ ERRO NO BLOCO CATCH ❌❌❌');
+    console.error('O erro foi:', err);
+    res.status(500).json({
+      error: 'Falha ao conectar ou consultar o banco de dados.',
+      details: err.message,
+      stack: err.stack
+    });
+  } finally {
+    // Garante que a conexão seja sempre liberada
+    if (client) {
+      client.release();
+      console.log('✅  [Passo 5] Conexão liberada de volta para o pool.');
+    }
   }
 });
 
