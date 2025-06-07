@@ -1,10 +1,11 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 // src/pages/Login.tsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { login } from '@/services/authService';
+import logo from '../assets/logo2.png';
 export default function Login() {
-    const [email, setCpf] = useState('');
+    const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [erro, setErro] = useState('');
     const navigate = useNavigate();
@@ -20,5 +21,5 @@ export default function Login() {
             setErro(err.response?.data?.error || 'Erro ao fazer login');
         }
     };
-    return (_jsx("div", { className: "flex h-screen items-center justify-center bg-[#d1d1d1]", children: _jsxs("form", { onSubmit: handleLogin, className: "bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm", children: [_jsx("h2", { className: "text-2xl font-bold mb-6 text-[#1b75bb] text-center", children: "Login - Orbe Garage" }), erro && _jsx("p", { className: "text-red-600 mb-4 text-center", children: erro }), _jsxs("div", { className: "mb-4", children: [_jsx("label", { className: "block text-sm text-gray-700", children: "CPF" }), _jsx("input", { type: "text", value: email, onChange: (e) => setCpf(e.target.value), className: "w-full p-2 border border-gray-300 rounded mt-1", required: true })] }), _jsxs("div", { className: "mb-6", children: [_jsx("label", { className: "block text-sm text-gray-700", children: "Senha" }), _jsx("input", { type: "password", value: senha, onChange: (e) => setSenha(e.target.value), className: "w-full p-2 border border-gray-300 rounded mt-1", required: true })] }), _jsx("button", { type: "submit", className: "w-full bg-[#1b75bb] text-white p-2 rounded hover:bg-[#5a9ec9] transition", children: "Entrar" })] }) }));
+    return (_jsx("div", { className: "flex items-center justify-center w-screen min-h-screen bg-[#2e2e2e]", children: _jsxs("div", { className: "w-full max-w-xs", children: [_jsxs("div", { className: "flex flex-col items-center mb-6", children: [_jsx("img", { src: logo, alt: "Logo Orbe Garage", className: "h-24 mb-4" }), _jsx("h2", { className: "text-3xl font-montserrat text-[#ffffff]", children: "Login" })] }), _jsxs("form", { onSubmit: handleLogin, className: "space-y-4", children: [erro && (_jsx("p", { className: "text-red-500 text-center text-sm", children: erro })), _jsxs("div", { className: "w-full flex flex-col items-center", children: [_jsx("label", { className: "block text-sm text-[#ffffff] mb-1", children: "Email" }), _jsx("input", { type: "email", value: email, onChange: e => setEmail(e.target.value), placeholder: "email", className: "w-60 h-6 px-4 bg-[#ffffff] rounded focus:outline-none", required: true })] }), _jsxs("div", { className: "w-full flex flex-col items-center", children: [_jsx("label", { className: "block text-sm text-[#ffffff] mb-1", children: "Senha" }), _jsx("input", { type: "password", value: senha, onChange: e => setSenha(e.target.value), placeholder: "senha", className: "w-60 h-6 px-4 bg-[#ffffff] rounded focus:outline-none", required: true })] }), _jsx("button", { type: "submit", className: "w-40 h-9 bg-[#1b75bb] text-white font-medium rounded self-center", children: "Entrar" }), _jsx("p", { className: "text-center", children: _jsx(Link, { to: "/Cadastro", className: "text-[#1b75bb] hover:underline", children: "cadastrar" }) })] })] }) }));
 }
