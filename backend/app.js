@@ -15,6 +15,14 @@ app.use(morgan('dev'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
 
+// A partir daqui, qualquer rota abaixo exigirá JWT válido
+app.use(verificarJWT);
+
+// Rotas protegidas (apenas com token válido)
+app.use('/api/clientes', require('./routes/clienteRoutes'));
+app.use('/api/veiculos', require('./routes/veiculoRoutes'));
+app.use('/api/os', require('./routes/osRoutes'));
+
 // Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
   res.send('Servidor de teste mínimo está no ar!');
