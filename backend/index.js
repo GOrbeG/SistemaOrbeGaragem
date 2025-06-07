@@ -3,16 +3,13 @@ require('dotenv').config();
 
 const app = require('./app');
 
-// usa a porta que o Render injeta em process.env.PORT, cai para 10000 em dev local
-const port = process.env.PORT || 10000;
+// NÃO faça fallback fixo para 10000 em produção:
+const port = process.env.PORT;
+if (!port) {
+  console.error('⚠️ A variável PORT não está definida. Verifique as configurações do serviço no Render.');
+  process.exit(1);
+}
 
-// rota de health-check (opcional mas recomendado)
-app.get('/', (_req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
-
-// ... suas outras rotas / middlewares aqui ...
-
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Servidor rodando na porta ${port}`);
 });
