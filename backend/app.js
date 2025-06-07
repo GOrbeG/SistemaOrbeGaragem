@@ -4,6 +4,7 @@ const pool = require('./config/db'); // Verifique se este caminho está correto
 const cors = require('cors');
 const morgan = require('morgan');
 require('dotenv').config();
+const verificarJWT = require('./middlewares/authMiddleware');
 const app = express();
 
 // Middlewares globais
