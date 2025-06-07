@@ -28,6 +28,9 @@ app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/historico', require('./routes/historicoRoutes'));
 app.use('/api/agendamentos', require('./routes/agendamentosRoutes'));
 app.use('/api/comentarios', require('./routes/comentariosRoutes'));
+app.use('/api/financeiro', require('./routes/financeiroRoutes'));
+app.use('/api/favoritos', require('./routes/favoritosRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 // Rota raiz para o Render verificar se o servidor está vivo
 app.get('/', (req, res) => {
