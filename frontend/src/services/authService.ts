@@ -4,15 +4,44 @@ import { jwtDecode } from 'jwt-decode';
 
 const API_URL = '/api'; // ajuste conforme seu backend
 
-// Interface dos dados retornados pelo login
-type LoginResponse = {
+// Tipos internos para decodificação do token JWT
+interface DecodedUser {
+  id: number;
+  nome: string;
+  email: string;
+  papel: 'cliente' | 'funcionario' | 'administrador';
+}
+
+/**
+ * Dados de usuário expostos nas APIs do frontend
+ */
+export interface UserData {
+  id: number;
+  nome: string;
+  email: string;
+  role: DecodedUser['papel'];
+}
+
+/**
+ * Resposta esperada do endpoint de login
+ */
+interface LoginResponse {
   token: string;
-  usuario: {
-    id: number;
-    nome: string;
-    email: string;
-    papel: 'cliente' | 'funcionario' | 'administrador';
-  };
+  usuario: DecodedUser;
+}
+
+/**
+ * Faz login e retorna token + dados do usuário
+ */
+export const login = async (
+  email: string,
+  senha: string
+): Promise<LoginResponse> => {
+  const { data } = await axios.post<LoginResponse>(
+    `${API_URL}/login`,
+    { email, senha }
+  );
+  return data;
 };
 
 // Interface dos dados de cadastro
@@ -21,7 +50,7 @@ interface CadastroData {
   email: string;
   senha: string;
   cpf: string;
-  papel: 'cliente' | 'funcionario' | 'administrador';
+  role: 'cliente' | 'funcionario' | 'administrador';
   foto?: string;
 }
 
@@ -35,18 +64,6 @@ interface DecodedToken {
   iat: number;
   exp: number;
 }
-
-// Faz login e retorna o token + usuário
-export const login = async (
-  email: string,
-  senha: string
-): Promise<LoginResponse> => {
-  const { data } = await axios.post<LoginResponse>(
-    `${API_URL}/login`,
-    { email, senha }
-  );
-  return data;
-};
 
 // Lê token salvo e retorna ou null
 export const getToken = (): string | null => {
@@ -66,19 +83,25 @@ enum StorageKey {
 }
 export const salvarAuth = (
   token: string,
-  usuario: LoginResponse['usuario']
+  usuario: DecodedUser
 ): void => {
   localStorage.setItem(StorageKey.TOKEN, token);
   localStorage.setItem(StorageKey.USUARIO, JSON.stringify(usuario));
 };
 
 // Lê token e retorna o objeto decodificado ou null
-export const getUserDataFromToken = (): LoginResponse['usuario'] | null => {
+export const getUserDataFromToken = (): UserData| null => {
   const token = getToken();
   if (!token) return null;
 
   try {
-    return jwtDecode<LoginResponse['usuario']>(token);
+    const decoded = jwtDecode<DecodedUser>(token);
+    return {
+      id: decoded.id,
+      nome: decoded.nome,
+      email: decoded.email,
+      role: decoded.papel,
+    };
   } catch (err) {
     console.error('Erro ao decodificar token:', err);
     return null;
