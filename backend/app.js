@@ -15,6 +15,7 @@ app.use(morgan('dev'));
 // Rotas públicas (login e registro)
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
+app.use('/api/os', require('./routes/osRoutes'));
 
 // A partir daqui, qualquer rota abaixo exigirá JWT válido
 app.use(verificarJWT());
