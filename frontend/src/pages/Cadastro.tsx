@@ -45,9 +45,10 @@ export default function Cadastro() {
     }
 
     try {
-      await axios.post('/api/usuarios', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const API_URL = import.meta.env.VITE_API_URL;
+      await axios.post(`${API_URL}/api/usuarios/novo`, formData, { // Adicione /novo no final
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
       navigate('/login');
     } catch (error) {
       alert('Erro ao cadastrar.');

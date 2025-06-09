@@ -10,7 +10,6 @@ const router = express.Router();
 
 // Criar novo usuário (admin ou funcionário)
 router.post('/novo',
-  checkPermissao(['administrador']),
   [
     body('nome').notEmpty().withMessage('Nome é obrigatório'),
     body('email').isEmail().withMessage('E-mail inválido'),
