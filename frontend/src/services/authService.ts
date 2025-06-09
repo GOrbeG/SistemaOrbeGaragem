@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = '/api'; // ajuste conforme seu backend
+const API_URL = import.meta.env.VITE_API_URL; // ajuste conforme seu backend
 
 // Tipos internos para decodificação do token JWT
 interface DecodedUser {
