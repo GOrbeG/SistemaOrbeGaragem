@@ -6,10 +6,14 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const checkPermissao = require('../middlewares/checkPermissao');
 
+const multer = require('multer');
+const upload = multer();
+
 const router = express.Router();
 
 // Criar novo usuário (admin ou funcionário)
 router.post('/novo',
+  upload.single('foto'),
   [
     body('nome').notEmpty().withMessage('Nome é obrigatório'),
     body('email').isEmail().withMessage('E-mail inválido'),
