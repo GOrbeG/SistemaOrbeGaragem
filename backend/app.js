@@ -15,6 +15,7 @@ app.use(morgan('dev'));
 // Rotas públicas (login e registro)
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
+app.use('/api/usuarios', require('./routes/usuariosRoutes'));
 
 // A partir daqui, qualquer rota abaixo exigirá JWT válido
 app.use(verificarJWT());
@@ -23,7 +24,6 @@ app.use(verificarJWT());
 app.use('/api/clientes', require('./routes/clienteRoutes'));
 app.use('/api/veiculos', require('./routes/veiculoRoutes'))
 app.use('/api/os', require('./routes/osRoutes'));
-app.use('/api/usuarios', require('./routes/usuariosRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/historico', require('./routes/historicoRoutes'));
 app.use('/api/agendamentos', require('./routes/agendamentosRoutes'));
