@@ -47,7 +47,7 @@ export default function Login() {
             </h2>
 
             {/* Formulário */}
-            <form onSubmit={handleLogin} className="space-y-8 flex flex-col items-center">
+            <form onSubmit={handleLogin} className="space-y-2 flex flex-col items-center">
               {erro && (
                 <p className="text-red-500 text-center text-sm font-semibold bg-red-100 p-2 rounded">
                   {erro}
