@@ -40,9 +40,9 @@ export default function Login() {
 
         {/* Container do formulário, centralizado */}
         <main className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-xs">
             {/* Título "Login" */}
-            <h2 className="text-40xl font-extrabold text-[#e7933b] text-center mb-10">
+            <h2 className="text-7xl font-extrabold text-[#e7933b] text-center mb-10">
               Login
             </h2>
 
@@ -61,7 +61,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="email" // <-- Palavra "email" agora está aqui
-                  className="w-full h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  className="w-65 h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
                   required
                 />
               </div>
@@ -73,7 +73,7 @@ export default function Login() {
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   placeholder="senha" // <-- Palavra "senha" agora está aqui
-                  className="w-full h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
+                  className="w-65 h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
                   required
                 />
               </div>
