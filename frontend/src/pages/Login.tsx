@@ -42,7 +42,7 @@ export default function Login() {
         <main className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-sm">
             {/* Título "Login" */}
-            <h2 className="text-6xl font-bold text-[#e7933b] text-center mb-10">
+            <h2 className="text-10xl font-bold text-[#e7933b] text-center mb-10">
               Login
             </h2>
 
@@ -63,7 +63,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-60 h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  className="w-66 h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
                   required
                 />
               </div>
@@ -77,7 +77,7 @@ export default function Login() {
                   type="password"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  className="w-60 h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
+                  className="w-66 h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
                   required
                 />
               </div>
@@ -87,7 +87,7 @@ export default function Login() {
                 type="submit"
                 // Estilo do gradiente e outros
                 style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
-                className="w-40 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity mx-auto"
+                className="w-45 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity rounded mx-auto"
               >
                 Entrar
               </button>
