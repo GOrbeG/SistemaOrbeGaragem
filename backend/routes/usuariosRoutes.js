@@ -29,8 +29,8 @@ router.post('/novo',
     try {
       const hash = await bcrypt.hash(senha, 10);
       const result = await db.query(
-        `INSERT INTO usuarios (nome, email, cpf, senha, papel)
-         VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, cpf, papel`,
+        `INSERT INTO usuarios (nome, email, cpf, senha, role)
+         VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, cpf, role`,
         [nome, email, cpf, hash, papel]
       );
       res.status(201).json(result.rows[0]);

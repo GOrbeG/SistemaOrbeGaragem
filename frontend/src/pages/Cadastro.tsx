@@ -9,7 +9,7 @@ interface FormData {
   email: string;
   senha: string;
   cpf: string;
-  papel: 'cliente' | 'funcionario';
+  role: 'cliente' | 'funcionario';
   foto?: FileList;
 }
 
@@ -39,7 +39,7 @@ export default function Cadastro() {
     formData.append('email', data.email);
     formData.append('senha', data.senha);
     formData.append('cpf', data.cpf);
-    formData.append('papel', data.papel);
+    formData.append('role', data.role);
     if (foto) {
       formData.append('foto', foto);
     }
@@ -113,15 +113,15 @@ export default function Cadastro() {
 
         <div>
           <select
-            {...register('papel', { required: 'Selecione o papel' })}
+            {...register('role', { required: 'Selecione o papel' })}
             className="w-full border p-2 rounded"
           >
             <option value="">Selecione o papel</option>
             <option value="cliente">Cliente</option>
             <option value="funcionario">Funcionário</option>
           </select>
-          {errors.papel && (
-            <p className="text-red-500 text-sm">{errors.papel.message}</p>
+          {errors.role && (
+            <p className="text-red-500 text-sm">{errors.role.message}</p>
           )}
         </div>
 

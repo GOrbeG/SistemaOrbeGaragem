@@ -30,13 +30,13 @@ router.post('/',
         {
           id: usuario.id,
           nome: usuario.nome,
-          papel: usuario.papel
+          role: usuario.role
         },
         process.env.JWT_SECRET,
         { expiresIn: '12h' }
       );
 
-      res.json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, papel: usuario.papel } });
+      res.json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, role: usuario.role } });
     } catch (error) {
       res.status(500).json({ error: 'Erro ao fazer login' });
     }
