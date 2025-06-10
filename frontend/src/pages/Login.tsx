@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login, salvarAuth } from '@/services/authService';
-import logo from '../assets/logo2.png';
+import logo from '../assets/logologin.png';
+import backgroundImage from '../assets/loginpage.png';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -22,61 +23,77 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center w-screen min-h-screen bg-[#2e2e2e]">
-      <div className="w-full max-w-xs">
-        {/* Logo e Título */}
-        <div className="flex flex-col items-center mb-6">
-          <img src={logo} alt="Logo Orbe Garage" className="h-24 mb-4" />
-          <h2 className="text-3xl font-montserrat text-[#ffffff]">Login</h2>
-        </div>
+    // Container principal com a imagem de fundo
+    <div
+      className="flex min-h-screen w-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
+      {/* Container para todo o conteúdo da página */}
+      <div className="flex flex-col flex-1 p-8 sm:p-12">
+        {/* Header com a logo e o link de cadastro */}
+        <header className="flex justify-between items-center w-full">
+          <img src={logo} alt="Logo Orbe" className="h-10 w-auto" />
+          <Link to="/cadastro" className="text-[#e7933b] text-lg font-semibold hover:underline">
+            cadastrar
+          </Link>
+        </header>
 
-        {/* Formulário sem card branco */}
-        <form
-          onSubmit={handleLogin}
-          className="w-full flex flex-col items-center space-y-4"
-        >
-          {erro && (
-            <p className="text-red-500 text-center text-sm">{erro}</p>
-          )}
+        {/* Container do formulário, centralizado */}
+        <main className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-sm">
+            {/* Título "Login" */}
+            <h2 className="text-6xl font-bold text-[#e7933b] text-center mb-10">
+              Login
+            </h2>
 
-          <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-[#ffffff] mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="email"
-              className="w-60 h-9 px-3 bg-white rounded focus:outline-none"
-              required
-            />
+            {/* Formulário */}
+            <form onSubmit={handleLogin} className="space-y-6">
+              {erro && (
+                <p className="text-red-500 text-center text-sm font-semibold bg-red-100 p-2 rounded">
+                  {erro}
+                </p>
+              )}
+
+              {/* Campo de Email */}
+              <div>
+                <label className="block text-lg font-medium text-[#2e2e2e] mb-1">
+                  email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-60 h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  required
+                />
+              </div>
+
+              {/* Campo de Senha */}
+              <div>
+                <label className="block text-lg font-medium text-[#2e2e2e] mb-1">
+                  senha
+                </label>
+                <input
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  className="w-60 h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
+                  required
+                />
+              </div>
+
+              {/* Botão de Entrar */}
+              <button
+                type="submit"
+                // Estilo do gradiente e outros
+                style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
+                className="w-40 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity"
+              >
+                Entrar
+              </button>
+            </form>
           </div>
-
-          <div className="w-full flex flex-col items-center">
-            <label className="block text-sm text-[#ffffff] mb-1">Senha</label>
-            <input
-              type="password"
-              value={senha}
-              onChange={e => setSenha(e.target.value)}
-              placeholder="senha"
-              className="w-60 h-9 px-3 bg-[#ffffff] rounded focus:outline-none"
-              required
-            />
-          </div>
-
-          {/* Botão centralizado via mx-auto */}
-          <button
-            type="submit"
-            className="w-40 h-3 bg-[#1b75bb] text-white font-medium rounded mx-auto"
-          >
-            Entrar
-          </button>
-
-          <p className="text-center">
-            <Link to="/Cadastro" className="text-[#1b75bb] hover:underline">
-              cadastrar
-            </Link>
-          </p>
-        </form>
+        </main>
       </div>
     </div>
   );
