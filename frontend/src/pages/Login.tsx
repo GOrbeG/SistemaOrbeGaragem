@@ -55,7 +55,7 @@ export default function Login() {
               )}
 
               {/* Campo de Email */}
-              <div>
+              <div className="w-full flex flex-col items-center">
                 <label className="block text-lg font-medium text-[#2e2e2e] mb-1">
                   email
                 </label>
@@ -69,7 +69,7 @@ export default function Login() {
               </div>
 
               {/* Campo de Senha */}
-              <div>
+              <div className="w-full flex flex-col items-center">
                 <label className="block text-lg font-medium text-[#2e2e2e] mb-1">
                   senha
                 </label>
@@ -87,7 +87,7 @@ export default function Login() {
                 type="submit"
                 // Estilo do gradiente e outros
                 style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
-                className="w-40 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity"
+                className="w-40 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity mx-auto"
               >
                 Entrar
               </button>
