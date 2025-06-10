@@ -38,9 +38,12 @@ export const login = async (
   senha: string
 ): Promise<LoginResponse> => {
   const { data } = await axios.post<LoginResponse>(
-    `${API_URL}/login`,
+    `${API_URL}/api/login`,
     { email, senha }
   );
+  if (data.token && data.usuario) {
+    salvarAuth(data.token, data.usuario);
+  }
   return data;
 };
 
