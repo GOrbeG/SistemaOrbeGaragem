@@ -47,7 +47,7 @@ export default function Login() {
             </h2>
 
             {/* Formulário */}
-            <form onSubmit={handleLogin} className="space-y-6 flex flex-col items-center">
+            <form onSubmit={handleLogin} className="space-y-8 flex flex-col items-center">
               {erro && (
                 <p className="text-red-500 text-center text-sm font-semibold bg-red-100 p-2 rounded">
                   {erro}
@@ -61,7 +61,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="email" // <-- Palavra "email" agora está aqui
-                  className="w-65 h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  className="w-70 h-12 px-6 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
                   required
                 />
               </div>
@@ -73,7 +73,7 @@ export default function Login() {
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   placeholder="senha" // <-- Palavra "senha" agora está aqui
-                  className="w-65 h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
+                  className="w-70 h-12 px-6 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
                   required
                 />
               </div>
@@ -83,7 +83,7 @@ export default function Login() {
                 type="submit"
                 // Estilo do gradiente e outros
                 style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
-                className="w-45 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity"
+                className="w-55 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity"
               >
                 Entrar
               </button>
