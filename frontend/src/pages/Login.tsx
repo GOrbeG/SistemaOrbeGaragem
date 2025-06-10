@@ -42,12 +42,12 @@ export default function Login() {
         <main className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-sm">
             {/* Título "Login" */}
-            <h2 className="text-10xl font-bold text-[#e7933b] text-center mb-10">
+            <h2 className="text-40xl font-extrabold text-[#e7933b] text-center mb-10">
               Login
             </h2>
 
             {/* Formulário */}
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-6 flex flex-col items-center">
               {erro && (
                 <p className="text-red-500 text-center text-sm font-semibold bg-red-100 p-2 rounded">
                   {erro}
@@ -55,29 +55,25 @@ export default function Login() {
               )}
 
               {/* Campo de Email */}
-              <div className="w-full flex flex-col items-center">
-                <label className="block text-lg font-medium text-[#2e2e2e] mb-1">
-                  email
-                </label>
+              <div className="w-full">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-66 h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  placeholder="email" // <-- Palavra "email" agora está aqui
+                  className="w-full h-12 px-4 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white"
                   required
                 />
               </div>
 
               {/* Campo de Senha */}
-              <div className="w-full flex flex-col items-center">
-                <label className="block text-lg font-medium text-[#2e2e2e] mb-1">
-                  senha
-                </label>
+              <div className="w-full">
                 <input
                   type="password"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  className="w-66 h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
+                  placeholder="senha" // <-- Palavra "senha" agora está aqui
+                  className="w-full h-12 px-4 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b]"
                   required
                 />
               </div>
@@ -87,7 +83,7 @@ export default function Login() {
                 type="submit"
                 // Estilo do gradiente e outros
                 style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
-                className="w-45 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity rounded mx-auto"
+                className="w-45 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity"
               >
                 Entrar
               </button>
