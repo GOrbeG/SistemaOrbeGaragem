@@ -61,7 +61,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="email" // <-- Palavra "email" agora está aqui
-                  className="w-70 h-12 px-6 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white -translate-y-[100px]"
+                  className="w-80 h-12 px-6 bg-[#e7933b] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-white -translate-y-[120px]"
                   required
                 />
               </div>
@@ -73,7 +73,7 @@ export default function Login() {
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   placeholder="senha" // <-- Palavra "senha" agora está aqui
-                  className="w-70 h-12 px-6 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b] -translate-y-[80px]"
+                  className="w-80 h-12 px-6 bg-[#ffffff] text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7933b] -translate-y-[100px]"
                   required
                 />
               </div>
@@ -83,7 +83,7 @@ export default function Login() {
                 type="submit"
                 // Estilo do gradiente e outros
                 style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
-                className="w-55 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity -translate-y-[68px]"
+                className="w-55 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity -translate-y-[88px] translate-x-[50px]"
               >
                 Entrar
               </button>
