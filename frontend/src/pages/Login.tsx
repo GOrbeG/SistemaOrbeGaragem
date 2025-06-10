@@ -42,12 +42,12 @@ export default function Login() {
         <main className="flex-1 flex items-center justify-center">
           <div className="w-80 max-w-xs">
             {/* Título "Login" */}
-            <h2 className="text-7xl font-extrabold text-[#e7933b] text-center mb-10">
+            <h2 className="text-10xl font-extrabold text-[#e7933b] text-center mb-14">
               Login
             </h2>
 
             {/* Formulário */}
-            <form onSubmit={handleLogin} className="space-y-2 flex flex-col items-center">
+            <form onSubmit={handleLogin} className="space-y-8 flex flex-col items-center">
               {erro && (
                 <p className="text-red-500 text-center text-sm font-semibold bg-red-100 p-2 rounded">
                   {erro}
