@@ -42,7 +42,7 @@ export default function Login() {
         <main className="flex-1 flex items-center justify-center">
           <div className="w-80 max-w-xs">
             {/* Título "Login" */}
-            <h2 className="text-10xl font-extrabold text-[#e7933b] text-center mb-14">
+            <h2 className="text-[10rem] font-extrabold text-[#e7933b] text-center mb-14">
               Login
             </h2>
 
