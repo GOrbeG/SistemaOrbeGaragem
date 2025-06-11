@@ -1,8 +1,10 @@
 // src/pages/Cadastro.tsx
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import logo from '../assets/logologin.png';
+import backgroundImage from '../assets/cadastropage.png';
 
 interface FormData {
   nome: string;
@@ -56,91 +58,83 @@ export default function Cadastro() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#1b75bb]">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-white p-8 rounded shadow-md w-full max-w-md space-y-4"
+      // Container principal com imagem de fundo
+      <div
+        className="flex flex-col min-h-screen w-full bg-cover bg-center bg-[#2e2e2e] p-8 sm:p-12"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
       >
-        <h2 className="text-2xl font-semibold text-center text-[#2e2e2e]">
-          Cadastro
-        </h2>
-
-        <div>
-          <input
-            {...register('nome', { required: 'Nome é obrigatório' })}
-            placeholder="Nome"
-            className="w-full border p-2 rounded"
-          />
-          {errors.nome && (
-            <p className="text-red-500 text-sm">{errors.nome.message}</p>
-          )}
-        </div>
-
-        <div>
-          <input
-            {...register('email', { required: 'Email é obrigatório' })}
-            placeholder="Email"
-            type="email"
-            className="w-full border p-2 rounded"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
-          )}
-        </div>
-
-        <div>
-          <input
-            {...register('senha', { required: 'Senha é obrigatória' })}
-            placeholder="Senha"
-            type="password"
-            className="w-full border p-2 rounded"
-          />
-          {errors.senha && (
-            <p className="text-red-500 text-sm">{errors.senha.message}</p>
-          )}
-        </div>
-
-        <div>
-          <input
-            {...register('cpf', { required: 'CPF é obrigatório' })}
-            placeholder="CPF (000.000.000-00)"
-            className="w-full border p-2 rounded"
-          />
-          {errors.cpf && (
-            <p className="text-red-500 text-sm">{errors.cpf.message}</p>
-          )}
-        </div>
-
-        <div>
-          <select
-            {...register('role', { required: 'Selecione o papel' })}
-            className="w-full border p-2 rounded"
-          >
-            <option value="">Selecione o papel</option>
-            <option value="cliente">Cliente</option>
-            <option value="funcionario">Funcionário</option>
-          </select>
-          {errors.role && (
-            <p className="text-red-500 text-sm">{errors.role.message}</p>
-          )}
-        </div>
-
-        <div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setFoto(e.target.files?.[0] || null)}
-            className="w-full border p-2 rounded"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-[#1b75bb] text-white p-2 rounded hover:bg-[#2e2e2e]"
-        >
-          Cadastrar
-        </button>
-      </form>
-    </div>
-  );
-}
+        {/* Header */}
+        <header className="flex justify-between items-center w-full">
+          <div className="flex items-center space-x-4">
+            <img src={logo} alt="Logo Orbe" className="h-10 w-auto" />
+            <span className="text-white text-2xl font-semibold">Orbe Garagem</span>
+          </div>
+          <Link to="/login">
+            <button
+              style={{ backgroundColor: '#e7933b' }}
+              className="px-6 py-2 text-[#2e2e2e] text-lg font-bold rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Entrar
+            </button>
+          </Link>
+        </header>
+  
+        {/* Main: Título e Formulário */}
+        <main className="flex-1 flex flex-col items-center justify-center text-white">
+          <h2 className="text-6xl font-extrabold mb-12">Cadastrar</h2>
+  
+          <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-4xl">
+            {/* Layout em Grid para os campos do formulário */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
+              
+              {/* Coluna da Esquerda */}
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-lg font-medium mb-1">Nome</label>
+                  <input {...register('nome', { required: true })} className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium mb-1">Email</label>
+                  <input {...register('email', { required: true })} type="email" className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium mb-1">Senha</label>
+                  <input {...register('senha', { required: true })} type="password" className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium mb-1">CPF</label>
+                  <input {...register('cpf', { required: true })} placeholder="000.000.000-00" className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                </div>
+              </div>
+  
+              {/* Coluna da Direita */}
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-lg font-medium mb-1">Foto</label>
+                  <input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files?.[0] || null)} className="w-full text-sm" />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium mb-1">Função</label>
+                  <select {...register('role', { required: true })} className="w-full h-12 px-4 bg-white text-black rounded-md">
+                    <option value="cliente">Cliente</option>
+                    <option value="funcionario">Funcionário</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+  
+            {/* Botão de Cadastro Centralizado */}
+            <div className="flex justify-center mt-12">
+              <button
+                type="submit"
+                style={{ backgroundColor: '#e7933b' }}
+                className="px-12 py-3 text-[#2e2e2e] text-xl font-bold rounded-lg hover:opacity-90 transition-opacity"
+              >
+                cadastrar
+              </button>
+            </div>
+          </form>
+        </main>
+      </div>
+    );
+  }

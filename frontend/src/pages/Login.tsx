@@ -33,7 +33,7 @@ export default function Login() {
         {/* Header com a logo e o link de cadastro */}
         <header className="flex justify-between items-center w-full">
           <img src={logo} alt="Logo Orbe" className="h-10 w-auto translate-x-[50px]" />
-          <Link to="/cadastro" className="text-[#e7933b] text-lg font-semibold hover:underline -translate-x-[80px]">
+          <Link to="/cadastro" className="text-[#e7933b] text-lg font-semibold hover:underline -translate-x-[80px] text-[1rem]">
             cadastrar
           </Link>
         </header>
