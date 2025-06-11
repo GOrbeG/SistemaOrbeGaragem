@@ -40,9 +40,9 @@ export default function Login() {
 
         {/* Container do formulário, centralizado */}
         <main className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-sm">
+          <div className="w-100 max-w-sm">
             {/* Título "Login" */}
-            <h2 className="text-[5rem] font-extrabold text-[#e7933b] text-center mb-10 -translate-y-[100px]">
+            <h2 className="text-[5rem] font-extrabold text-[#e7933b] text-center mb-10 -translate-y-[150px]">
               Login
             </h2>
 
