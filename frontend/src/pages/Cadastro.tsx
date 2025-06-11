@@ -95,7 +95,7 @@ export default function Cadastro() {
               {/* Coluna da Esquerda */}
               <div className="space-y-6 flex flex-col items-center md:items-start"> {/* Alinhamento para a esquerda em telas maiores */}
                 <div>
-                  <label className="block text-lg text-[#e7933b] font-medium mb-1">Nome</label>
+                  <label className="block text-[1rem] text-[#e7933b] font-medium mb-1">Nome</label>
                   <input {...register('nome', { required: true })} className="w-80 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
