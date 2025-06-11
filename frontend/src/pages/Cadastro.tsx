@@ -130,7 +130,7 @@ export default function Cadastro() {
             </div>
   
             {/* Botão de Cadastro Centralizado */}
-            <div className="flex justify-center mt-12 translate-y-[40px]">
+            <div className="flex justify-center mt-12 translate-y-[40px] px-14 py-6">
               <button
                 type="submit"
                 style={{ backgroundColor: '#e7933b' }}
