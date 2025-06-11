@@ -64,7 +64,7 @@ export default function Cadastro() {
         style={{ backgroundImage: `url(${backgroundImage})` }}
       >
         {/* Header */}
-        <header className="flex justify-between items-center w-full shadow-md px-8 sm:px-12 py-4">
+        <header className="flex justify-between items-center w-full bg-white shadow-md px-8 sm:px-12 py-4">
           <div className="flex items-center space-x-4">
             <img src={logo} alt="Logo Orbe" className="h-10 w-auto" />
             <span className="text-[#053255] text-[5rem] font-semibold">Orbe Garagem</span>
@@ -82,7 +82,7 @@ export default function Cadastro() {
         {/* Main: Título e Formulário */}
         <div className="flex flex-col flex-1 p-8 sm:p-12">
         <main className="flex-1 flex flex-col items-center justify-center text-white">
-          <h2 className="text-[5rem] text-[#ffffff] font-extrabold mb-12 -translate-y-[80px]">Cadastrar</h2>
+          <h2 className="text-[3rem] text-[#ffffff] font-extrabold mb-12 -translate-y-[80px]">Cadastrar</h2>
   
           <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-4xl">
             {/* Layout em Grid para os campos do formulário */}
