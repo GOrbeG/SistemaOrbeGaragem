@@ -58,34 +58,38 @@ export default function Cadastro() {
   };
 
   return (
-      // Container principal com imagem de fundo
+    // Container principal da página inteira
+    <div className="min-h-screen w-full bg-[#2e2e2e]">
+
+      {/* MUDANÇA 1: O Header agora é um elemento separado no topo */}
+      <header className="flex justify-between items-center w-full bg-white shadow-md px-8 sm:px-12 py-4">
+        <div className="flex items-center space-x-4">
+          <img src={logo} alt="Logo Orbe" className="h-10 w-auto" />
+          <span className="text-[#053255] text-[3rem] font-semibold">Orbe Garagem</span>
+        </div>
+        <Link to="/login">
+          <button
+            style={{ backgroundColor: '#e7933b' }}
+            className="px-6 py-2 text-[#2e2e2e] text-lg font-bold rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Entrar
+          </button>
+        </Link>
+      </header>
+
+      {/* MUDANÇA 2: O conteúdo principal (imagem de fundo e formulário) fica abaixo do header */}
       <div
-        className="flex flex-col min-h-screen w-full bg-cover bg-center bg-[#2e2e2e] p-8 sm:p-12"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        className="flex flex-col flex-1 p-8 sm:p-12 items-center justify-center bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          // Garante que o container ocupe o espaço restante
+          height: 'calc(100vh - 88px)', // 100% da altura da tela menos a altura aproximada do header
+        }}
       >
-        {/* Header */}
-        <header className="flex justify-between items-center w-full bg-white shadow-md px-8 sm:px-12 py-4">
-          <div className="flex items-center space-x-4">
-            <img src={logo} alt="Logo Orbe" className="h-10 w-auto" />
-            <span className="text-[#053255] text-[5rem] font-semibold">Orbe Garagem</span>
-          </div>
-          <Link to="/login">
-            <button
-              style={{ backgroundColor: '#e7933b' }}
-              className="px-6 py-2 text-[#2e2e2e] text-lg font-bold rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Entrar
-            </button>
-          </Link>
-        </header>
-  
-        {/* Main: Título e Formulário */}
-        <div className="flex flex-col flex-1 p-8 sm:p-12">
-        <main className="flex-1 flex flex-col items-center justify-center text-white">
-          <h2 className="text-[3rem] text-[#ffffff] font-extrabold mb-12 -translate-y-[80px]">Cadastrar</h2>
-  
+        <main className="flex flex-col items-center justify-center text-white w-full">
+          <h2 className="text-6xl font-extrabold mb-12">Cadastrar</h2>
+
           <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-4xl">
-            {/* Layout em Grid para os campos do formulário */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
               
               {/* Coluna da Esquerda */}
