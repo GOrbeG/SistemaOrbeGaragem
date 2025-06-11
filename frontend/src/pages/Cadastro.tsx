@@ -81,7 +81,7 @@ export default function Cadastro() {
   
         {/* Main: Título e Formulário */}
         <main className="flex-1 flex flex-col items-center justify-center text-white">
-          <h2 className="text-6xl font-extrabold mb-12">Cadastrar</h2>
+          <h2 className="text-[5rem] text-[#e7933b] font-extrabold mb-12 -translate-y-[80px]">Cadastrar</h2>
   
           <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-4xl">
             {/* Layout em Grid para os campos do formulário */}
@@ -91,19 +91,19 @@ export default function Cadastro() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-lg font-medium mb-1">Nome</label>
-                  <input {...register('nome', { required: true })} className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('nome', { required: true })} className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
                   <label className="block text-lg font-medium mb-1">Email</label>
-                  <input {...register('email', { required: true })} type="email" className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('email', { required: true })} type="email" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
                   <label className="block text-lg font-medium mb-1">Senha</label>
-                  <input {...register('senha', { required: true })} type="password" className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('senha', { required: true })} type="password" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
                   <label className="block text-lg font-medium mb-1">CPF</label>
-                  <input {...register('cpf', { required: true })} placeholder="000.000.000-00" className="w-full h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('cpf', { required: true })} placeholder="000.000.000-00" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
               </div>
   
@@ -111,11 +111,11 @@ export default function Cadastro() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-lg font-medium mb-1">Foto</label>
-                  <input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files?.[0] || null)} className="w-full text-sm" />
+                  <input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files?.[0] || null)} className="w-60 text-sm" />
                 </div>
                 <div>
                   <label className="block text-lg font-medium mb-1">Função</label>
-                  <select {...register('role', { required: true })} className="w-full h-12 px-4 bg-white text-black rounded-md">
+                  <select {...register('role', { required: true })} className="w-60 h-12 px-4 bg-white text-black rounded-md">
                     <option value="cliente">Cliente</option>
                     <option value="funcionario">Funcionário</option>
                   </select>
