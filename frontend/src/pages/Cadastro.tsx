@@ -75,6 +75,7 @@ export default function Cadastro() {
             Entrar
           </button>
         </Link>
+      
       </header>
 
       {/* MUDANÇA 2: O conteúdo principal (imagem de fundo e formulário) fica abaixo do header */}
@@ -133,7 +134,7 @@ export default function Cadastro() {
               <button
                 type="submit"
                 style={{ backgroundColor: '#e7933b' }}
-                className="px-12 py-3 text-[#2e2e2e] text-xl font-bold rounded-lg hover:opacity-90 transition-opacity"
+                className="px-14 py-6 text-[#2e2e2e] text-xl font-bold rounded-lg hover:opacity-90 transition-opacity"
               >
                 cadastrar
               </button>
