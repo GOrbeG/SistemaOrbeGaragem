@@ -70,7 +70,7 @@ export default function Cadastro() {
         <Link to="/login">
           <button
             style={{ backgroundColor: '#e7933b' }}
-            className="px-20 py-20 text-[#2e2e2e] text-lg font-bold rounded-lg hover:opacity-90 transition-opacity"
+            className="px-100 py-20 text-[#2e2e2e] text-lg font-bold rounded-lg hover:opacity-90 transition-opacity -translate-x-[100px]"
           >
             Entrar
           </button>
@@ -95,19 +95,19 @@ export default function Cadastro() {
               {/* Coluna da Esquerda */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-lg font-medium mb-1">Nome</label>
+                  <label className="block text-lg text-[#e7933b] font-medium mb-1">Nome</label>
                   <input {...register('nome', { required: true })} className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
-                  <label className="block text-lg font-medium mb-1">Email</label>
+                  <label className="block text-lg text-[#e7933b] font-medium mb-1">Email</label>
                   <input {...register('email', { required: true })} type="email" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
-                  <label className="block text-lg font-medium mb-1">Senha</label>
+                  <label className="block text-lg text-[#e7933b] font-medium mb-1">Senha</label>
                   <input {...register('senha', { required: true })} type="password" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
-                  <label className="block text-lg font-medium mb-1">CPF</label>
+                  <label className="block text-lg text-[#e7933b] font-medium mb-1">CPF</label>
                   <input {...register('cpf', { required: true })} placeholder="000.000.000-00" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
               </div>
@@ -115,11 +115,11 @@ export default function Cadastro() {
               {/* Coluna da Direita */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-lg font-medium mb-1">Foto</label>
+                  <label className="block text-lg text-[#e7933b] font-medium mb-1">Foto</label>
                   <input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files?.[0] || null)} className="w-60 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-lg font-medium mb-1">Função</label>
+                  <label className="block text-lg text-[#e7933b] font-medium mb-1">Função</label>
                   <select {...register('role', { required: true })} className="w-60 h-12 px-4 bg-white text-black rounded-md">
                     <option value="cliente">Cliente</option>
                     <option value="funcionario">Funcionário</option>
