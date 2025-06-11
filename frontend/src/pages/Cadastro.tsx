@@ -79,7 +79,7 @@ export default function Cadastro() {
 
       {/* MUDANÇA 2: O conteúdo principal (imagem de fundo e formulário) fica abaixo do header */}
       <div
-        className="flex flex-col flex-1 p-8 sm:p-12 items-center justify-center bg-cover bg-center"
+        className="flex flex-col flex-1 p-8 sm:p-12 items-center justify-start bg-cover bg-center"
         style={{
           backgroundImage: `url(${backgroundImage})`,
           // Garante que o container ocupe o espaço restante
@@ -93,34 +93,34 @@ export default function Cadastro() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
               
               {/* Coluna da Esquerda */}
-              <div className="space-y-6">
+              <div className="space-y-6 flex flex-col items-center md:items-start"> {/* Alinhamento para a esquerda em telas maiores */}
                 <div>
                   <label className="block text-lg text-[#e7933b] font-medium mb-1">Nome</label>
-                  <input {...register('nome', { required: true })} className="w-60 h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('nome', { required: true })} className="w-80 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
                   <label className="block text-lg text-[#e7933b] font-medium mb-1">Email</label>
-                  <input {...register('email', { required: true })} type="email" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('email', { required: true })} type="email" className="w-80 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
                   <label className="block text-lg text-[#e7933b] font-medium mb-1">Senha</label>
-                  <input {...register('senha', { required: true })} type="password" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('senha', { required: true })} type="password" className="w-80 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
                 <div>
                   <label className="block text-lg text-[#e7933b] font-medium mb-1">CPF</label>
-                  <input {...register('cpf', { required: true })} placeholder="000.000.000-00" className="w-60 h-12 px-4 bg-white text-black rounded-md" />
+                  <input {...register('cpf', { required: true })} placeholder="000.000.000-00" className="w-80 h-12 px-4 bg-white text-black rounded-md" />
                 </div>
               </div>
   
               {/* Coluna da Direita */}
-              <div className="space-y-6">
+              <div className="space-y-6 flex flex-col items-center md:items-start"> {/* Alinhamento para a esquerda em telas maiores */}
                 <div>
                   <label className="block text-lg text-[#e7933b] font-medium mb-1">Foto</label>
-                  <input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files?.[0] || null)} className="w-60 text-sm" />
+                  <input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files?.[0] || null)} className="w-80 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 hover:file:bg-gray-300" />
                 </div>
                 <div>
                   <label className="block text-lg text-[#e7933b] font-medium mb-1">Função</label>
-                  <select {...register('role', { required: true })} className="w-60 h-12 px-4 bg-white text-black rounded-md">
+                  <select {...register('role', { required: true })} className="w-80 h-12 px-4 bg-white text-black rounded-md">
                     <option value="cliente">Cliente</option>
                     <option value="funcionario">Funcionário</option>
                   </select>
