@@ -40,7 +40,7 @@ export default function Login() {
 
         {/* Container do formulário, centralizado */}
         <main className="flex-1 flex items-center justify-center">
-          <div className="w-80 max-w-xs">
+          <div className="w-80 max-w-sm">
             {/* Título "Login" */}
             <h2 className="text-[5rem] font-extrabold text-[#e7933b] text-center mb-10 -translate-y-[100px]">
               Login
@@ -83,7 +83,7 @@ export default function Login() {
                 type="submit"
                 // Estilo do gradiente e outros
                 style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
-                className="w-55 h-12 text-[#2e2e2e] text-xl font-bold rounded-md hover:opacity-90 transition-opacity -translate-y-[88px] translate-x-[50px]"
+                className="w-55 h-12 text-[#2e2e2e] text-xl font-bold rounded-x1 hover:opacity-90 transition-opacity -translate-y-[88px] translate-x-[50px] shadow-lg shadow-orange-400/50 hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
               >
                 Entrar
               </button>
