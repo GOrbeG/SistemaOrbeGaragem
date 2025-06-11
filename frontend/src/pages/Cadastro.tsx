@@ -70,7 +70,7 @@ export default function Cadastro() {
         <Link to="/login">
           <button
             style={{ backgroundColor: '#e7933b' }}
-            className="px-100 py-20 text-[#2e2e2e] text-lg font-bold rounded-lg hover:opacity-90 transition-opacity -translate-x-[100px]"
+            className="px-6 py-6 text-[#2e2e2e] text-lg font-bold rounded-3xl hover:opacity-90 transition-opacity -translate-x-[100px]"
           >
             Entrar
           </button>
@@ -129,7 +129,7 @@ export default function Cadastro() {
             </div>
   
             {/* Botão de Cadastro Centralizado */}
-            <div className="flex justify-center mt-12 translate-y-[60px]">
+            <div className="flex justify-center mt-12 translate-y-[40px]">
               <button
                 type="submit"
                 style={{ backgroundColor: '#e7933b' }}
