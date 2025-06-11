@@ -80,6 +80,7 @@ export default function Cadastro() {
         </header>
   
         {/* Main: Título e Formulário */}
+        <div className="flex flex-col flex-1 p-8 sm:p-12">
         <main className="flex-1 flex flex-col items-center justify-center text-white">
           <h2 className="text-[5rem] text-[#ffffff] font-extrabold mb-12 -translate-y-[80px]">Cadastrar</h2>
   
@@ -136,5 +137,6 @@ export default function Cadastro() {
           </form>
         </main>
       </div>
+    </div>
     );
   }
