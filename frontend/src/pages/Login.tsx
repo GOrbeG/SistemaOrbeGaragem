@@ -83,7 +83,7 @@ export default function Login() {
                 type="submit"
                 // Estilo do gradiente e outros
                 style={{ backgroundImage: 'linear-gradient(to right, #ffde59, #ff914d)' }}
-                className="w-55 h-16 text-[#2e2e2e] text-xl font-bold rounded-xl hover:opacity-90 transition-opacity -translate-y-[88px] translate-x-[50px] shadow-lg shadow-orange-400/50 hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
+                className="w-55 h-40 text-[#2e2e2e] text-xl font-bold rounded-xl hover:opacity-90 transition-opacity -translate-y-[88px] translate-x-[50px] shadow-lg shadow-orange-400/50 hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
               >
                 Entrar
               </button>
