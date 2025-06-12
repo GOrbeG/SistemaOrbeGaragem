@@ -70,7 +70,7 @@ export default function Cadastro() {
         <Link to="/login">
           <button
             style={{ backgroundColor: '#e7933b' }}
-            className="px-[30px] py-[30px] text-[#2e2e2e] text-[20px] font-bold rounded-3xl hover:opacity-90 transition-opacity -translate-x-[100px]"
+            className="px-[20px] py-[20px] text-[#2e2e2e] text-[20px] font-bold rounded-3xl hover:opacity-90 transition-opacity -translate-x-[100px]"
           >
             Entrar
           </button>
@@ -134,7 +134,7 @@ export default function Cadastro() {
               <button
                 type="submit"
                 style={{ backgroundColor: '#e7933b' }}
-                className="px-[15px] py-[12px] text-[#2e2e2e] text-xl font-bold rounded-lg hover:opacity-90 transition-opacity"
+                className="px-[10px] py-[8px] text-[#2e2e2e] text-xl font-bold rounded-lg hover:opacity-90 transition-opacity"
               >
                 cadastrar
               </button>
