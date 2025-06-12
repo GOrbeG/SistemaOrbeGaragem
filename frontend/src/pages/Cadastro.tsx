@@ -134,7 +134,7 @@ export default function Cadastro() {
               <button
                 type="submit"
                 style={{ backgroundColor: '#e7933b' }}
-                className="px-14 py-4 text-[#2e2e2e] text-xl font-bold rounded-lg hover:opacity-90 transition-opacity"
+                className="px-[30px] py-[22py] text-[#2e2e2e] text-xl font-bold rounded-lg hover:opacity-90 transition-opacity"
               >
                 cadastrar
               </button>
