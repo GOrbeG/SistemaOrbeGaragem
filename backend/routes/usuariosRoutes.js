@@ -13,25 +13,26 @@ const router = express.Router();
 
 // Criar novo usuário (admin ou funcionário)
 router.post('/novo',
+  checkPermissao(['administrador']),
   upload.single('foto'),
   [
     body('nome').notEmpty().withMessage('Nome é obrigatório'),
     body('email').isEmail().withMessage('E-mail inválido'),
     body('cpf').notEmpty().withMessage('CPF é obrigatório'),
     body('senha').isLength({ min: 6 }).withMessage('A senha deve ter pelo menos 6 caracteres'),
-    body('papel').isIn(['cliente', 'funcionario', 'administrador']).withMessage('Papel inválido')
+    body('role').isIn(['cliente', 'funcionario', 'administrador']).withMessage('Papel inválido')
   ],
   async (req, res) => {
     const erros = validationResult(req);
     if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
-    const { nome, email, cpf, senha, papel } = req.body;
+    const { nome, email, cpf, senha, role } = req.body;
     try {
       const hash = await bcrypt.hash(senha, 10);
       const result = await db.query(
         `INSERT INTO usuarios (nome, email, cpf, senha, role)
          VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, cpf, role`,
-        [nome, email, cpf, hash, papel]
+        [nome, email, cpf, hash, role]
       );
       res.status(201).json(result.rows[0]);
     } catch (error) {
