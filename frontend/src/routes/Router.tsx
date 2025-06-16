@@ -1,11 +1,15 @@
 // src/routes/Router.tsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// --- PASSO 1: Adicione 'Outlet' à lista de importações ---
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+
 import SplashScreen from '../pages/SplashScreen';
 import Login from '../pages/Login';
 import Cadastro from '../pages/Cadastro';
 import PrivateRoute from '../components/PrivateRoute';
+import AppLayout from '../components/layout/AppLayout';
 
-// Crie (ou importe) as páginas protegidas—por enquanto, apenas placeholders
+// Importe suas páginas protegidas
 import Dashboard from '../pages/Dashboard';
 import Financeiro from '../pages/Financeiro';
 import Agendamentos from '../pages/Agendamentos';
@@ -13,80 +17,44 @@ import OrdensServico from '../pages/OrdensServico';
 import Historico from '../pages/Historico';
 import Favoritos from '../pages/Favoritos';
 import Perfil from '../pages/Perfil';
+import CadastrarFuncionario from '../pages/admin/CadastrarFuncionario';
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota pública */}
+        {/* Rotas Públicas */}
         <Route path="/" element={<SplashScreen />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
 
-        {/** ROTAS PROTEGIDAS **/}
-        {/* Se o usuário não estiver logado, vai para /login */}
+        {/* --- PASSO 2: Crie um grupo de rotas que usarão o layout principal --- */}
         <Route
-          path="/dashboard"
+          path="/"
           element={
-            <PrivateRoute allowedRoles={['administrador', 'funcionario']}>
-              <Dashboard />
+            <PrivateRoute allowedRoles={[]}> {/* Protege o layout inteiro */}
+              <AppLayout>
+                <Outlet /> {/* O <Outlet> renderiza a rota filha correspondente */}
+              </AppLayout>
             </PrivateRoute>
           }
-        />
+        >
+          {/* --- PASSO 3: Coloque todas as rotas protegidas AQUI, como filhas --- */}
+          {/* O `path` aqui é relativo ao pai. Como o pai é "/", o path continua o mesmo. */}
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="financeiro" element={<Financeiro />} />
+          <Route path="agendamentos" element={<Agendamentos />} />
+          <Route path="os" element={<OrdensServico />} />
+          <Route path="historico" element={<Historico />} />
+          <Route path="favoritos" element={<Favoritos />} />
+          <Route path="perfil" element={<Perfil />} />
+          <Route path="admin/funcionarios/novo" element={<CadastrarFuncionario />} />
+          {/* Adicione outras rotas protegidas aqui */}
+        </Route>
 
-        <Route
-          path="/financeiro"
-          element={
-            <PrivateRoute allowedRoles={['administrador']}>
-              <Financeiro />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/agendamentos"
-          element={
-            <PrivateRoute allowedRoles={['administrador', 'funcionario', 'cliente']}>
-              <Agendamentos />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/os"
-          element={
-            <PrivateRoute allowedRoles={['administrador', 'funcionario']}>
-              <OrdensServico />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/historico"
-          element={
-            <PrivateRoute allowedRoles={['cliente', 'funcionario']}>
-              <Historico />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/favoritos"
-          element={
-            <PrivateRoute allowedRoles={['cliente']}>
-              <Favoritos />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/perfil"
-          element={
-            <PrivateRoute allowedRoles={[]} /* qualquer usuário autenticado */>
-              <Perfil />
-            </PrivateRoute>
-          }
-        />
+        {/* Você pode adicionar uma rota de "Não encontrado" ou "Acesso Negado" aqui se desejar */}
+        {/* <Route path="/forbidden" element={<AcessoNegado />} /> */}
+        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </BrowserRouter>
   );

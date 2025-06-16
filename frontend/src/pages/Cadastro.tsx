@@ -123,7 +123,6 @@ export default function Cadastro() {
                   <label className="block text-lg text-[#e7933b] font-medium mb-1">Função</label>
                   <select {...register('role', { required: true })} className="w-80 h-12 px-4 bg-white text-black rounded-md">
                     <option value="cliente">Cliente</option>
-                    <option value="funcionario">Funcionário</option>
                   </select>
                 </div>
               </div>

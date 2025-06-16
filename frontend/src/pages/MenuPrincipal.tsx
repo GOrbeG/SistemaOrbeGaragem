@@ -41,6 +41,7 @@ export default function MenuPrincipal() {
           <>
             <MenuCard label="Meus Agendamentos" onClick={() => navigate('/agendamentos')} />
             <MenuCard label="Minhas OS" onClick={() => navigate('/ordens')} />
+            <MenuCard label="Meus Veículos" onClick={() => navigate('/meus-veiculos')} />
             <MenuCard label="Favoritos" onClick={() => navigate('/favoritos')} />
             <MenuCard label="Histórico" onClick={() => navigate('/historico')} />
             <MenuCard label="Perfil" onClick={() => navigate('/perfil')} />
@@ -54,6 +55,7 @@ export default function MenuPrincipal() {
             <MenuCard label="Agenda" onClick={() => navigate('/agendamentos')} />
             <MenuCard label="Histórico" onClick={() => navigate('/historico')} />
             <MenuCard label="Perfil" onClick={() => navigate('/perfil')} />
+            <MenuCard label="Clientes" onClick={() => navigate('/clientes')} />
           </>
         );
       case 'administrador':
@@ -66,6 +68,7 @@ export default function MenuPrincipal() {
             <MenuCard label="Usuários" onClick={() => navigate('/usuarios')} />
             <MenuCard label="Histórico" onClick={() => navigate('/historico')} />
             <MenuCard label="Perfil" onClick={() => navigate('/perfil')} />
+            <MenuCard label="Cadastrar Funcionário" onClick={() => navigate('/admin/funcionarios/novo')} />
           </>
         );
       default:
