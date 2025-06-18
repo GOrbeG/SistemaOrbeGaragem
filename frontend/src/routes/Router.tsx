@@ -16,6 +16,17 @@ import Favoritos from '../pages/Favoritos';
 import Perfil from '../pages/Perfil';
 import CadastrarFuncionario from '../pages/admin/CadastrarFuncionario';
 
+// Crie um componente para o Layout Protegido
+const ProtectedLayout = () => {
+  return (
+    <PrivateRoute allowedRoles={[]}> {/* Protege todas as rotas filhas */}
+      <AppLayout>
+        <Outlet /> {/* O <Outlet> renderiza a rota filha correspondente */}
+      </AppLayout>
+    </PrivateRoute>
+  );
+};
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -26,16 +37,7 @@ export default function AppRoutes() {
         <Route path="/cadastro" element={<Cadastro />} />
 
         {/* Agrupador de Rotas Protegidas com o Layout Principal */}
-        <Route
-          element={
-            <PrivateRoute allowedRoles={[]}> {/* Protege todas as rotas filhas */}
-              <AppLayout>
-                <Outlet /> {/* Onde as páginas filhas serão renderizadas */}
-              </AppLayout>
-            </PrivateRoute>
-          }
-        >
-          {/* Coloque aqui todas as rotas que devem ter o layout com sidebar */}
+      <Route element={<ProtectedLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/financeiro" element={<Financeiro />} />
           <Route path="/agendamentos" element={<Agendamentos />} />
