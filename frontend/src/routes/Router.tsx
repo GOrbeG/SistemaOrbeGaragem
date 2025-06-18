@@ -1,5 +1,6 @@
 // src/routes/Router.tsx
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import PrivateRoute from '../components/PrivateRoute';
 import AppLayout from '../components/layout/AppLayout';
 
@@ -28,6 +29,20 @@ const ProtectedLayout = () => {
 };
 
 export default function AppRoutes() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Lógica da SplashScreen movida para cá
+    const timer = setTimeout(() => setLoading(false), 3000); // 3 segundos
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Se estiver carregando, mostra a SplashScreen em qualquer rota
+  if (loading) {
+    return <SplashScreen />;
+  }
+
+  // Após o carregamento, renderiza as rotas normais
   return (
     <BrowserRouter>
       <Routes>
