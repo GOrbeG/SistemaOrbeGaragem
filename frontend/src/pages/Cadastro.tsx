@@ -11,7 +11,7 @@ interface FormData {
   email: string;
   senha: string;
   cpf: string;
-  role: 'cliente' | 'funcionario';
+  role: 'cliente' | 'funcionario' | 'administrador';
   foto?: FileList;
 }
 
@@ -37,23 +37,24 @@ export default function Cadastro() {
     }
 
     const formData = new FormData();
+    const cpfLimpo = data.cpf.replace(/[^\d]/g, '');
     formData.append('nome', data.nome);
     formData.append('email', data.email);
     formData.append('senha', data.senha);
-    formData.append('cpf', data.cpf);
+    formData.append('cpf', cpfLimpo);
     formData.append('role', data.role);
-    if (foto) {
-      formData.append('foto', foto);
+    if (data.foto && data.foto[0]) {
+      formData.append('foto', data.foto[0]);
     }
 
     try {
       const API_URL = import.meta.env.VITE_API_URL;
-      await axios.post(`${API_URL}/api/auth/register`, formData, { // Adicione /novo no final
+      await axios.post(`${API_URL}/api/auth/register`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
       navigate('/login');
     } catch (error) {
-      alert('Erro ao cadastrar.');
+      alert('Erro ao cadastrar. Verifique o console para mais detalhes.');
     }
   };
 

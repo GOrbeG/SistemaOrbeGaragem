@@ -18,6 +18,8 @@ exports.register = async (req, res) => {
 
   try {
     // Verifica se o usuário já existe
+    const cpfLimpo = cpf.replace(/[^\d]/g, '');
+
     const usuarioExistente = await db.query('SELECT * FROM usuarios WHERE email = $1 OR cpf = $2', [email, cpf]);
     if (usuarioExistente.rows.length > 0) {
       return res.status(400).json({ error: 'E-mail ou CPF já cadastrado.' });
@@ -30,7 +32,7 @@ exports.register = async (req, res) => {
     // A query para inserir no banco de dados já estava correta
     const result = await db.query(
       'INSERT INTO usuarios (nome, email, senha, cpf, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, cpf, role',
-      [nome, email, cpf, senhaHash, role]
+      [nome, email, cpfLimpo, senhaHash, role]
     );
 
     res.status(201).json({
