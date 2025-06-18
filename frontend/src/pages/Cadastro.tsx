@@ -48,7 +48,7 @@ export default function Cadastro() {
 
     try {
       const API_URL = import.meta.env.VITE_API_URL;
-      await axios.post(`${API_URL}/api/usuarios/novo`, formData, { // Adicione /novo no final
+      await axios.post(`${API_URL}/api/auth/register`, formData, { // Adicione /novo no final
       headers: { 'Content-Type': 'multipart/form-data' },
     });
       navigate('/login');
