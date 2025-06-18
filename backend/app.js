@@ -1,15 +1,15 @@
-// backend/app.js - VERSÃO DE TESTE MÍNIMA
+// backend/app.js
 const express = require('express');
-const pool = require('./config/db'); // Verifique se este caminho está correto
 const cors = require('cors');
 const morgan = require('morgan');
 require('dotenv').config();
+
 const verificarJWT = require('./middlewares/authMiddleware');
 const app = express();
 
-// Middlewares globais
+// --- Middlewares Globais ---
 const corsOptions = {
-  // Coloque aqui a URL exata do seu frontend no Render
+  // A URL exata do seu frontend no Render
   origin: 'https://sistemaorbegaragem-1.onrender.com', 
   optionsSuccessStatus: 200
 };
@@ -17,17 +17,23 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Rotas públicas (login e registro)
+
+// --- ROTAS PÚBLICAS ---
+// Apenas login e o registro de novos CLIENTES ficam aqui.
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
-app.use('/api/usuarios', require('./routes/usuariosRoutes'));
 
-// A partir daqui, qualquer rota abaixo exigirá JWT válido
+
+// --- PROTEÇÃO GLOBAL ---
+// A partir daqui, TODAS as rotas abaixo exigirão um token JWT válido para prosseguir.
 app.use(verificarJWT());
 
-// Rotas protegidas (apenas com token válido)
+
+// --- ROTAS PROTEGIDAS ---
+// Agora, a rota para gerenciar usuários (criar funcionários, etc.) está aqui.
+app.use('/api/usuarios', require('./routes/usuariosRoutes')); 
 app.use('/api/clientes', require('./routes/clienteRoutes'));
-app.use('/api/veiculos', require('./routes/veiculoRoutes'))
+app.use('/api/veiculos', require('./routes/veiculoRoutes'));
 app.use('/api/os', require('./routes/osRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/historico', require('./routes/historicoRoutes'));
@@ -45,41 +51,11 @@ app.use('/api/tecnicos', require('./routes/tecnicosRoutes'));
 app.use('/api/itens-ordem', require('./routes/itemOrdemRoutes'));
 app.use('/api/agenda', require('./routes/agendaRoutes'));
 
-// Rota raiz para o Render verificar se o servidor está vivo
+
+// Rota raiz apenas para checagem de status
 app.get('/', (req, res) => {
-  res.send('Servidor de teste mínimo está no ar!');
+  res.send('API Orbe Garage rodando com sucesso!');
 });
 
-// Rota de teste do banco de dados com LOGS DETALHADOS
-app.get('/api/test-db', async (req, res) => {
-  console.log('➡️  [Passo 1] Recebi uma requisição em /api/test-db.');
-  let client;
-
-  try {
-    console.log('➡️  [Passo 2] Tentando obter uma conexão do pool...');
-    client = await pool.connect(); // Tenta pegar uma conexão
-    console.log('✅  [Passo 3] Conexão do pool obtida com sucesso!');
-
-    const result = await client.query('SELECT NOW()');
-    console.log('✅  [Passo 4] Query executada com sucesso!');
-
-    res.json({ agora: result.rows[0].now });
-
-  } catch (err) {
-    console.error('❌❌❌ ERRO NO BLOCO CATCH ❌❌❌');
-    console.error('O erro foi:', err);
-    res.status(500).json({
-      error: 'Falha ao conectar ou consultar o banco de dados.',
-      details: err.message,
-      stack: err.stack
-    });
-  } finally {
-    // Garante que a conexão seja sempre liberada
-    if (client) {
-      client.release();
-      console.log('✅  [Passo 5] Conexão liberada de volta para o pool.');
-    }
-  }
-});
 
 module.exports = app;
