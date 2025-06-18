@@ -1,19 +1,19 @@
 // backend/controllers/authController.js
 
-// --- MUDANÇA 1: Importe o 'validationResult' ---
+// --- MUDANÇA 1: Importe o 'validationResult' da biblioteca express-validator ---
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 exports.register = async (req, res) => {
-  // Executa as validações que definimos na rota
+  // A validação agora funcionará porque importamos a função
   const erros = validationResult(req);
   if (!erros.isEmpty()) {
     return res.status(400).json({ erros: erros.array() });
   }
 
-  // MUDANÇA 2: Remova 'role' daqui, pois ele será definido como 'cliente' logo abaixo
+  // MUDANÇA 2: Remova 'role' desta linha, pois ele será definido como 'cliente' mais abaixo
   const { nome, email, senha, cpf } = req.body;
 
   try {
@@ -23,11 +23,11 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: 'E-mail ou CPF já cadastrado.' });
     }
 
-    // Garante que o 'role' para registros públicos seja sempre 'cliente'
+    // Garante que o 'role' para registros públicos seja sempre 'cliente' por segurança
     const role = 'cliente';
     const senhaHash = await bcrypt.hash(senha, 10);
 
-    // A query para inserir no banco já estava correta, usando 'role'
+    // A query para inserir no banco de dados já estava correta
     const result = await db.query(
       'INSERT INTO usuarios (nome, email, senha, cpf, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, cpf, role',
       [nome, email, cpf, senhaHash, role]
@@ -45,14 +45,14 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  // A sua função de login já está correta e não precisa de alterações.
+  // Sua função de login está correta, não precisa de alterações.
   // Apenas adicionei um log de erro para facilitar depurações futuras.
   const { email, senha } = req.body;
   try {
     const result = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     const user = result.rows[0];
     if (!user) {
-      return res.status(401).json({ error: 'Credenciais inválidas' }); // Usar 401 para não vazar info
+      return res.status(401).json({ error: 'Credenciais inválidas' });
     }
 
     const senhaValida = await bcrypt.compare(senha, user.senha);
