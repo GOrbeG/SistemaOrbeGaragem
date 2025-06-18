@@ -16,7 +16,7 @@ export default function Login() {
     try {
       const { token, usuario } = await login(email, senha);
       salvarAuth(token, usuario);
-      navigate('/menu');
+      navigate('/dashboard');
     } catch (err: any) {
       setErro(err.response?.data?.error || 'Erro ao fazer login');
     }
