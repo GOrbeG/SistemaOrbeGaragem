@@ -16,12 +16,12 @@ import Favoritos from '../pages/Favoritos';
 import Perfil from '../pages/Perfil';
 import CadastrarFuncionario from '../pages/admin/CadastrarFuncionario';
 
-// Criamos um componente que une a proteção e o layout
+// Componente que une a proteção e o layout
 const ProtectedLayout = () => {
   return (
-    <PrivateRoute allowedRoles={[]}> {/* Protege todas as rotas filhas */}
+    <PrivateRoute allowedRoles={[]}>
       <AppLayout>
-        <Outlet /> {/* O <Outlet /> renderiza a rota filha ativa */}
+        <Outlet />
       </AppLayout>
     </PrivateRoute>
   );
@@ -32,14 +32,15 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
         {/* === ROTAS PÚBLICAS === */}
-        {/* Não têm sidebar nem header */}
         <Route path="/" element={<SplashScreen />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
 
-        {/* === ROTAS PROTEGIDAS === */}
+        {/* === AGRUPADOR DE ROTAS PROTEGIDAS === */}
         {/* Todas as rotas aqui dentro usarão o layout principal */}
         <Route element={<ProtectedLayout />}>
+          
+          {/* --- MUDANÇA PRINCIPAL: Remova a barra "/" do início de todas as rotas filhas --- */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="financeiro" element={<Financeiro />} />
           <Route path="agendamentos" element={<Agendamentos />} />
@@ -48,10 +49,11 @@ export default function AppRoutes() {
           <Route path="favoritos" element={<Favoritos />} />
           <Route path="perfil" element={<Perfil />} />
           <Route path="admin/funcionarios/novo" element={<CadastrarFuncionario />} />
-          {/* Adicione aqui qualquer outra rota que precise de login */}
+          {/* Adicione outras rotas protegidas aqui com caminhos relativos */}
+
         </Route>
         
-        {/* Você pode adicionar uma rota de "Não encontrado" ou "Acesso Negado" no final */}
+        {/* Você pode adicionar uma rota de "Não encontrado" aqui se desejar */}
         {/* <Route path="*" element={<NotFoundPage />} /> */}
       </Routes>
     </BrowserRouter>
