@@ -40,14 +40,14 @@ export default function AppRoutes() {
         {/* === ROTAS PROTEGIDAS === */}
         {/* Todas as rotas aqui dentro usarão o layout principal */}
         <Route element={<ProtectedLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/financeiro" element={<Financeiro />} />
-          <Route path="/agendamentos" element={<Agendamentos />} />
-          <Route path="/os" element={<OrdensServico />} />
-          <Route path="/historico" element={<Historico />} />
-          <Route path="/favoritos" element={<Favoritos />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/admin/funcionarios/novo" element={<CadastrarFuncionario />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="financeiro" element={<Financeiro />} />
+          <Route path="agendamentos" element={<Agendamentos />} />
+          <Route path="os" element={<OrdensServico />} />
+          <Route path="historico" element={<Historico />} />
+          <Route path="favoritos" element={<Favoritos />} />
+          <Route path="perfil" element={<Perfil />} />
+          <Route path="admin/funcionarios/novo" element={<CadastrarFuncionario />} />
           {/* Adicione aqui qualquer outra rota que precise de login */}
         </Route>
         
