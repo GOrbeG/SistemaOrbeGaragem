@@ -28,7 +28,7 @@ const ProtectedLayout = () => {
   );
 };
 
-export default function AppRoutes() {
+const AppContent = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,7 +44,6 @@ export default function AppRoutes() {
 
   // Após o carregamento, renderiza as rotas normais
   return (
-    <BrowserRouter>
       <Routes>
         {/* === ROTAS PÚBLICAS === */}
         <Route path="/" element={<SplashScreen />} />
@@ -71,6 +70,13 @@ export default function AppRoutes() {
         {/* Você pode adicionar uma rota de "Não encontrado" aqui se desejar */}
         {/* <Route path="*" element={<NotFoundPage />} /> */}
       </Routes>
+  );
+};
+    export default function AppRoutes() {
+  // O componente principal agora só tem a responsabilidade de iniciar o BrowserRouter
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }
