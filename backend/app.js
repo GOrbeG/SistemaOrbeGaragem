@@ -8,7 +8,12 @@ const verificarJWT = require('./middlewares/authMiddleware');
 const app = express();
 
 // Middlewares globais
-app.use(cors());
+const corsOptions = {
+  // Coloque aqui a URL exata do seu frontend no Render
+  origin: 'https://sistemaorbegaragem-1.onrender.com', 
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 
