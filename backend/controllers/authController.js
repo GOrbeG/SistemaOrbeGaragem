@@ -7,32 +7,38 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 exports.register = async (req, res) => {
-  // A validação agora funcionará porque importamos a função
   const erros = validationResult(req);
   if (!erros.isEmpty()) {
     return res.status(400).json({ erros: erros.array() });
   }
 
-  // MUDANÇA 2: Remova 'role' desta linha, pois ele será definido como 'cliente' mais abaixo
   const { nome, email, senha, cpf } = req.body;
 
   try {
-    // Verifica se o usuário já existe
     const cpfLimpo = cpf.replace(/[^\d]/g, '');
-
-    const usuarioExistente = await db.query('SELECT * FROM usuarios WHERE email = $1 OR cpf = $2', [email, cpf]);
+    const usuarioExistente = await db.query('SELECT * FROM usuarios WHERE email = $1 OR cpf = $2', [email, cpfLimpo]);
+    
     if (usuarioExistente.rows.length > 0) {
       return res.status(400).json({ error: 'E-mail ou CPF já cadastrado.' });
     }
 
-    // Garante que o 'role' para registros públicos seja sempre 'cliente' por segurança
     const role = 'cliente';
     const senhaHash = await bcrypt.hash(senha, 10);
 
-    // A query para inserir no banco de dados já estava correta
+    // --- CÓDIGO DE DEPURAÇÃO ---
+    // Este bloco vai nos mostrar os dados exatos antes de salvar
+    console.log('--- INICIANDO DEPURAÇÃO DOS DADOS PARA INSERT ---');
+    console.log(`Valor de NOME: "${nome}", Tamanho: ${nome?.length}`);
+    console.log(`Valor de EMAIL: "${email}", Tamanho: ${email?.length}`);
+    console.log(`Valor de SENHA HASH: "${senhaHash}", Tamanho: ${senhaHash?.length}`);
+    console.log(`Valor de CPF LIMPO: "${cpfLimpo}", Tamanho: ${cpfLimpo?.length}`);
+    console.log(`Valor de ROLE: "${role}", Tamanho: ${role?.length}`);
+    console.log('--- FIM DA DEPURAÇÃO ---');
+    // --- FIM DO CÓDIGO DE DEPURAÇÃO ---
+
     const result = await db.query(
-      'INSERT INTO usuarios (nome, email, senha, cpf, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, cpf, role',
-      [nome, email, cpfLimpo, senhaHash, role]
+      `INSERT INTO usuarios (nome, email, senha, cpf, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email, cpf, role`,
+      [nome, email, senhaHash, cpfLimpo, role]
     );
 
     res.status(201).json({
