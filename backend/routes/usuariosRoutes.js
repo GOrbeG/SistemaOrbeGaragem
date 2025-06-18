@@ -20,7 +20,7 @@ router.post('/novo',
     body('email').isEmail().withMessage('E-mail inválido'),
     body('cpf').notEmpty().withMessage('CPF é obrigatório'),
     body('senha').isLength({ min: 6 }).withMessage('A senha deve ter pelo menos 6 caracteres'),
-    body('role').isIn(['cliente', 'funcionario', 'administrador']).withMessage('Papel inválido')
+    body('role').isIn(['cliente', 'funcionario', 'administrador']).withMessage('role inválido')
   ],
   async (req, res) => {
     const erros = validationResult(req);
@@ -46,7 +46,7 @@ router.put('/:id', checkPermissao(['administrador', 'funcionario', 'cliente']), 
   const { nome, email, cpf, senha } = req.body;
   const usuarioId = parseInt(req.params.id);
 
-  if (req.user.papel !== 'administrador' && req.user.id !== usuarioId) {
+  if (req.user.role !== 'administrador' && req.user.id !== usuarioId) {
     return res.status(403).json({ error: 'Acesso negado' });
   }
 
@@ -76,7 +76,7 @@ router.put('/:id', checkPermissao(['administrador', 'funcionario', 'cliente']), 
       return res.status(400).json({ error: 'Nenhum campo fornecido para atualização' });
     }
 
-    const query = `UPDATE usuarios SET ${campos.join(', ')} WHERE id = $${campos.length + 1} RETURNING id, nome, email, cpf, papel`;
+    const query = `UPDATE usuarios SET ${campos.join(', ')} WHERE id = $${campos.length + 1} RETURNING id, nome, email, cpf, role`;
     valores.push(usuarioId);
 
     const result = await db.query(query, valores);
@@ -90,7 +90,7 @@ router.put('/:id', checkPermissao(['administrador', 'funcionario', 'cliente']), 
 // Listar usuários
 router.get('/', checkPermissao(['administrador']), async (req, res) => {
   try {
-    const result = await db.query('SELECT id, nome, email, cpf, papel, criado_em FROM usuarios ORDER BY nome');
+    const result = await db.query('SELECT id, nome, email, cpf, role, criado_em FROM usuarios ORDER BY nome');
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar usuários' });
