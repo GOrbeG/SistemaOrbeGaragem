@@ -22,7 +22,7 @@ app.use(morgan('dev'));
 // Apenas login e o registro de novos CLIENTES ficam aqui.
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/login', require('./routes/loginRoutes'));
-
+app.use('/api/usuarios', require('./routes/usuariosRoutes')); //mover para baixo depois da criação de usuario
 
 // --- PROTEÇÃO GLOBAL ---
 // A partir daqui, TODAS as rotas abaixo exigirão um token JWT válido para prosseguir.
@@ -31,7 +31,6 @@ app.use(verificarJWT());
 
 // --- ROTAS PROTEGIDAS ---
 // Agora, a rota para gerenciar usuários (criar funcionários, etc.) está aqui.
-app.use('/api/usuarios', require('./routes/usuariosRoutes')); 
 app.use('/api/clientes', require('./routes/clienteRoutes'));
 app.use('/api/veiculos', require('./routes/veiculoRoutes'));
 app.use('/api/os', require('./routes/osRoutes'));
