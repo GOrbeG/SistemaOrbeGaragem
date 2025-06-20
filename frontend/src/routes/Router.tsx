@@ -1,6 +1,6 @@
 // src/routes/Router.tsx
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, } from 'react-router-dom';
 import PrivateRoute from '../components/PrivateRoute';
 import AppLayout from '../components/layout/AppLayout';
 
@@ -65,9 +65,9 @@ const AppContent = () => {
           <Route path="favoritos" element={<Favoritos />} />
           <Route path="perfil" element={<Perfil />} />
           <Route path="admin/funcionarios/novo" element={<CadastrarFuncionario />} />
-          <Route path="/clientes" element={<PrivateRoute allowedRoles={['administrador', 'funcionario']}><ClientesPage /></PrivateRoute>} />
-          <Route path="/clientes/novo" element={<PrivateRoute allowedRoles={['administrador', 'funcionario']}><ClienteFormPage /></PrivateRoute>} />
-          <Route path="/clientes/editar/:id" element={<PrivateRoute allowedRoles={['administrador', 'funcionario']}><ClienteFormPage /></PrivateRoute>} />
+          <Route path="clientes" element={<ClientesPage />} />
+          <Route path="clientes/novo" element={<ClienteFormPage />} />
+          <Route path="clientes/editar/:id"element={<ClienteFormPage />} />
           {/* Adicione outras rotas protegidas aqui com caminhos relativos */}
 
         </Route>
