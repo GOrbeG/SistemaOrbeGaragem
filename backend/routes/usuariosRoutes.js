@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Criar novo usuário (admin ou funcionário)
 router.post('/novo',
-  checkPermissao(['administrador']),
+  //checkPermissao(['administrador']),
   upload.single('foto'),
   [
     body('nome').notEmpty().withMessage('Nome é obrigatório'),
