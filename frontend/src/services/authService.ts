@@ -1,30 +1,24 @@
 // frontend/src/services/authService.ts
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import { api } from './api'; // ✅ MUDANÇA 1: Importa a instância 'api' em vez de axios
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-// --- MUDANÇA 1: Padronizar a interface para usar 'role' ---
+// Interfaces (não precisam de mudança)
 interface DecodedUser {
   id: number;
   nome: string;
   email: string;
   role: 'cliente' | 'funcionario' | 'administrador';
 }
-
 export interface UserData {
   id: number;
   nome: string;
   email: string;
   role: DecodedUser['role'];
 }
-
 interface LoginResponse {
   token: string;
   usuario: DecodedUser;
 }
-
-// Interface dos dados do formulário de cadastro
 export interface CadastroData extends Omit<UserData, 'id'> {
   senha: string;
   cpf: string;
@@ -38,8 +32,8 @@ export const login = async (
   email: string,
   senha: string
 ): Promise<LoginResponse> => {
-  const { data } = await axios.post<LoginResponse>(
-    `${API_URL}/api/login`,
+  const { data } = await api.post<LoginResponse>(
+    '/api/auth/login', // URL corrigida
     { email, senha }
   );
   if (data.token && data.usuario) {
@@ -52,8 +46,8 @@ export const login = async (
  * Realiza o cadastro de um novo cliente
  */
 export const cadastrar = async (formData: FormData) => {
-  // --- MUDANÇA 2: Corrigir a URL para a rota pública de registro ---
-  const response = await axios.post(`${API_URL}/api/auth/register`, formData, {
+  // ✅ MUDANÇA 3: Usa a instância 'api' para consistência
+  const response = await api.post('/api/auth/register', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     }
