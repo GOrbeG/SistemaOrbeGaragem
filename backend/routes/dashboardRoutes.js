@@ -25,7 +25,7 @@ router.get('/', verificarJWT(['administrador', 'funcionario']), async (req, res)
       db.query('SELECT COUNT(*) FROM ordens_servico'),
       db.query(`SELECT COUNT(*) FROM ordens_servico WHERE status ILIKE 'aberta'`),
       db.query(`SELECT COUNT(*) FROM ordens_servico WHERE status ILIKE 'fechada'`),
-      db.query(`SELECT COALESCE(SUM(valor_total), 0) AS receita FROM ordens_servico ${where}`, valores),
+      db.query(`SELECT COALESCE(SUM(it.valor), 0) AS receita FROM itens_ordem it JOIN ordens_servico os ON it.ordem_id = os.id ${where}`, valores),
       db.query(`
         SELECT TO_CHAR(data_criacao, 'YYYY-MM') AS mes, COUNT(*) AS total
         FROM ordens_servico ${where}
