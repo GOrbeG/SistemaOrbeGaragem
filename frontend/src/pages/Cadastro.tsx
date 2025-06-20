@@ -1,6 +1,5 @@
 // src/pages/Cadastro.tsx
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../assets/logologin.png';
@@ -21,10 +20,8 @@ export default function Cadastro() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
   } = useForm<FormData>();
 
-  const [foto, setFoto] = useState<File | null>(null);
   const navigate = useNavigate();
 
   const validarCPF = (cpf: string) => {

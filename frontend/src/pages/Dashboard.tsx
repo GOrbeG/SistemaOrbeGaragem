@@ -1,11 +1,11 @@
 // src/pages/Dashboard.tsx - VERSÃO MELHORADA
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getToken } from '@/services/authService';
 import DashboardCard from '@/components/DashboardCard'; // Importando nosso novo card
 
 // Ícones da Lucide
-import { Users, BookUser, Car, Wrench, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import { BookUser, Car, Wrench, DollarSign } from 'lucide-react';
 
 // Componentes da Recharts
 import {
@@ -158,7 +158,7 @@ export default function Dashboard() {
                 labelLine={false}
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
-                {statusData.map((entry, index) => (
+                {statusData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

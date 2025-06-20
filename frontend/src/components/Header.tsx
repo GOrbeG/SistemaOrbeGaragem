@@ -1,5 +1,4 @@
 // src/components/Header.tsx
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserDataFromToken, logout } from '@/services/authService';
 import { LogOut } from 'lucide-react'; // Ícone para o botão

@@ -1,5 +1,4 @@
 // frontend/src/components/clientes/ClientesTable.tsx
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Cliente } from '@/pages/clientes/ClientesPage';

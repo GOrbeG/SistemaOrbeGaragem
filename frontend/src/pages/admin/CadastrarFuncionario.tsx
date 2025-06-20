@@ -1,7 +1,6 @@
 // src/pages/admin/CadastrarFuncionario.tsx
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getToken } from '@/services/authService'; // Precisamos do token do admin
 
@@ -23,13 +22,10 @@ export default function CadastrarFuncionario() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
   } = useForm<FuncionarioFormData>();
 
-  const [foto, setFoto] = useState<File | null>(null);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
-  const navigate = useNavigate();
 
   const onSubmit = async (data: FuncionarioFormData) => {
     setErro('');

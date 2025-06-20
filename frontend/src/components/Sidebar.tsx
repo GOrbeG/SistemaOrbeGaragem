@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getUserDataFromToken } from '@/services/authService';
-import { Home, Users, Settings, Wrench, Calendar, FileText, DollarSign, BookUser, PlusSquare } from 'lucide-react';
+import { Home, Settings, Wrench, Calendar, FileText, DollarSign, BookUser, PlusSquare } from 'lucide-react';
 import logo from '../assets/logologin.png'; // Sua logo
 
 interface MenuItem {
