@@ -16,6 +16,8 @@ import Historico from '../pages/Historico';
 import Favoritos from '../pages/Favoritos';
 import Perfil from '../pages/Perfil';
 import CadastrarFuncionario from '../pages/admin/CadastrarFuncionario';
+import ClientesPage from '@/pages/clientes/ClientesPage';
+import ClienteFormPage from '@/pages/clientes/ClienteFormPage';
 
 // Componente que une a proteção e o layout
 const ProtectedLayout = () => {
@@ -63,6 +65,9 @@ const AppContent = () => {
           <Route path="favoritos" element={<Favoritos />} />
           <Route path="perfil" element={<Perfil />} />
           <Route path="admin/funcionarios/novo" element={<CadastrarFuncionario />} />
+          <Route path="/clientes" element={<PrivateRoute allowedRoles={['administrador', 'funcionario']}><ClientesPage /></PrivateRoute>} />
+          <Route path="/clientes/novo" element={<PrivateRoute allowedRoles={['administrador', 'funcionario']}><ClienteFormPage /></PrivateRoute>} />
+          <Route path="/clientes/editar/:id" element={<PrivateRoute allowedRoles={['administrador', 'funcionario']}><ClienteFormPage /></PrivateRoute>} />
           {/* Adicione outras rotas protegidas aqui com caminhos relativos */}
 
         </Route>
