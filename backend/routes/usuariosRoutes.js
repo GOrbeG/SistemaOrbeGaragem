@@ -5,11 +5,26 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const checkPermissao = require('../middlewares/checkPermissao');
-
 const multer = require('multer');
 const upload = multer();
-
 const router = express.Router();
+const registrarHistorico = require('../middlewares/logHistorico');
+
+// ✅ NOVA ROTA: Listar todos os usuários (funcionários e administradores)
+router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
+  try {
+    const query = `
+      SELECT id, nome FROM usuarios 
+      WHERE role = 'funcionario' OR role = 'administrador'
+      ORDER BY nome ASC
+    `;
+    const { rows } = await db.query(query);
+    res.json(rows);
+  } catch (error) {
+    console.error("ERRO AO LISTAR USUÁRIOS:", error);
+    res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
+  }
+});
 
 // Criar novo usuário (admin ou funcionário)
 router.post('/novo',
