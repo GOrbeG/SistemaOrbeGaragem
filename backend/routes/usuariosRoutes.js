@@ -36,7 +36,15 @@ router.post('/novo',
       );
       res.status(201).json(result.rows[0]);
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao criar usuário' });
+      // ✅ CORREÇÃO CRÍTICA: Adiciona o log detalhado do erro
+      console.error("ERRO DETALHADO AO CRIAR USUÁRIO:", error);
+
+      // Verifica se o erro é de violação de constraint única (email ou cpf)
+      if (error.code === '23505') { // Código de erro do PostgreSQL para unique_violation
+        return res.status(409).json({ error: `Já existe um usuário com este ${error.constraint.includes('email') ? 'email' : 'CPF'}.` });
+      }
+
+      res.status(500).json({ error: 'Erro interno ao criar o usuário.' });
     }
   }
 );
