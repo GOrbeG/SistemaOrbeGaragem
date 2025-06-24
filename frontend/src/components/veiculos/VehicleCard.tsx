@@ -1,6 +1,6 @@
 // src/components/veiculos/VehicleCard.tsx
 import { Car, Edit, Trash2 } from 'lucide-react';
-import { Veiculo } from '@/pages/os/OSFormPage'; // Reutilizando a interface
+import { Veiculo } from '@/types'; // Reutilizando a interface
 
 interface VehicleCardProps {
   vehicle: Veiculo;
