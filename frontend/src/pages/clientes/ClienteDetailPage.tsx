@@ -51,14 +51,19 @@ export default function ClienteDetailPage() {
       : api.post('/api/veiculos', { ...data, cliente_id: clienteId });
 
     try {
-      await apiCall;
-      fetchVeiculos(); // Atualiza a lista de veículos
-      handleCloseModal();
-    } catch (err) {
-      alert('Erro ao salvar veículo.');
-    } finally {
-      setIsSubmitting(false);
-    }
+     await apiCall;
+     fetchVeiculos();
+     handleCloseModal();
+    } catch (err: any) {
+  // ✅ MUDANÇA CRÍTICA: Loga o erro completo no console do navegador
+     console.error("ERRO DETALHADO AO SALVAR VEÍCULO:", err.response?.data);
+  
+  // ✅ MUDANÇA CRÍTICA: Exibe uma mensagem de erro mais específica
+     const errorMessage = err.response?.data?.errors?.[0]?.msg || err.response?.data?.error || 'Verifique os dados e tente novamente.';
+     alert(`Erro ao salvar veículo: ${errorMessage}`);
+     } finally {
+     setIsSubmitting(false);
+     }
   };
 
   const handleVehicleDelete = async (vehicleId: number) => {
