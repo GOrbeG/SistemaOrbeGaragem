@@ -2,8 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '@/services/api';
-import { Cliente } from './ClientesPage'; // Reutilizando interface
-import { Veiculo } from '@/pages/os/OSFormPage'; // Reutilizando interface
+import { Cliente, Veiculo } from '@/types'; // ✅ IMPORTAÇÃO CORRIGIDA
 import VehicleCard from '@/components/veiculos/VehicleCard';
 import VehicleForm, { VehicleFormData } from '@/components/veiculos/VehicleForm';
 import { PlusCircle } from 'lucide-react';
