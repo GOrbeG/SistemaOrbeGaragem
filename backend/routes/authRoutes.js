@@ -1,13 +1,57 @@
-// backend/src/routes/authRoutes.js - VERSÃO COM CADASTRO UNIFICADO
+// backend/src/routes/authRoutes.js - VERSÃO FINAL UNIFICADA
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs'); // Usando bcryptjs para consistência
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 const router = express.Router();
 
-// Validação para o novo formulário de cadastro de cliente
+// --- ROTA DE LOGIN ---
+// ✅ Lógica de login movida para cá
+router.post('/login', 
+  [
+    body('email').isEmail().withMessage('E-mail inválido'),
+    body('senha').notEmpty().withMessage('Senha é obrigatória')
+  ],
+  async (req, res) => {
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
+
+    const { email, senha } = req.body;
+
+    try {
+      const result = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+      if (result.rows.length === 0) {
+        return res.status(401).json({ error: 'Credenciais inválidas' });
+      }
+
+      const usuario = result.rows[0];
+      const senhaValida = await bcrypt.compare(senha, usuario.senha);
+      if (!senhaValida) {
+        return res.status(401).json({ error: 'Credenciais inválidas' });
+      }
+
+      const token = jwt.sign(
+        {
+          id: usuario.id,
+          nome: usuario.nome,
+          role: usuario.role
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '12h' }
+      );
+
+      res.json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, role: usuario.role } });
+    } catch (error) {
+      console.error("ERRO NO LOGIN:", error);
+      res.status(500).json({ error: 'Erro interno ao fazer login' });
+    }
+  }
+);
+
+
+// --- ROTA DE CADASTRO DE CLIENTE ---
 const validacaoCadastroCliente = [
   body('nome').notEmpty().withMessage('O nome é obrigatório'),
   body('email').isEmail().withMessage('Email inválido'),
@@ -16,7 +60,6 @@ const validacaoCadastroCliente = [
   body('telefone').notEmpty().withMessage('Telefone é obrigatório')
 ];
 
-// ✅ NOVO ENDPOINT: Rota transacional para registrar um cliente com acesso ao portal
 router.post('/register-client', validacaoCadastroCliente, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -25,13 +68,10 @@ router.post('/register-client', validacaoCadastroCliente, async (req, res) => {
 
   const { nome, email, senha, cpf_cnpj, telefone, data_nascimento, cep, logradouro, numero, bairro, cidade, estado } = req.body;
   
-  // Inicia a transação com o banco de dados
   const client = await db.connect();
   try {
-    // PASSO A: Inicia a operação "tudo ou nada"
     await client.query('BEGIN');
 
-    // PASSO B: Cria o registro na tabela 'usuarios'
     const hashedPassword = await bcrypt.hash(senha, 10);
     const userQuery = `
       INSERT INTO usuarios (nome, email, senha, role, cpf)
@@ -41,42 +81,28 @@ router.post('/register-client', validacaoCadastroCliente, async (req, res) => {
     const userResult = await client.query(userQuery, [nome, email, hashedPassword, cpf_cnpj]);
     const newUserId = userResult.rows[0].id;
 
-    // PASSO C: Cria o registro na tabela 'clientes', ligando com o usuário recém-criado
     const clienteQuery = `
       INSERT INTO clientes (nome, email, telefone, cpf_cnpj, tipo_pessoa, data_nascimento, cep, logradouro, numero, bairro, cidade, estado, usuario_id)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *;
     `;
-    const tipoPessoa = (cpf_cnpj || '').length > 14 ? 'PJ' : 'PF'; // Valida se é CNPJ ou CPF
+    const tipoPessoa = (cpf_cnpj || '').length > 14 ? 'PJ' : 'PF';
     
     await client.query(clienteQuery, [nome, email, telefone, cpf_cnpj, tipoPessoa, data_nascimento || null, cep, logradouro, numero, bairro, cidade, estado, newUserId]);
 
-    // PASSO D: Se tudo deu certo, confirma a transação
     await client.query('COMMIT');
     res.status(201).json({ message: 'Cadastro realizado com sucesso! Você já pode fazer o login.' });
 
   } catch (error) {
-    // PASSO E: Se algo deu errado, desfaz todas as operações
     await client.query('ROLLBACK');
     console.error("ERRO NA TRANSAÇÃO DE CADASTRO:", error);
-
-    if (error.code === '23505') { // Erro de valor único duplicado (email ou cpf)
+    if (error.code === '23505') {
       return res.status(409).json({ error: `Já existe um cadastro com este ${error.constraint.includes('email') ? 'email' : 'CPF/CNPJ'}.` });
     }
-    
     res.status(500).json({ error: 'Ocorreu um erro inesperado durante o cadastro.' });
   } finally {
-    // Libera a conexão com o banco de dados
     client.release();
   }
 });
-
-
-// Rota de Login (pode manter a sua lógica atual aqui, se já tiver)
-router.post('/login', async (req, res) => {
-    // ... sua lógica de login atual ...
-    // Se não tiver, podemos adicionar depois.
-});
-
 
 module.exports = router;

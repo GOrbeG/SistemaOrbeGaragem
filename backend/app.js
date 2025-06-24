@@ -21,7 +21,7 @@ app.use(morgan('dev'));
 // --- ROTAS PÚBLICAS ---
 // Apenas login e o registro de novos CLIENTES ficam aqui.
 app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/login', require('./routes/loginRoutes'));
+
 
 // --- PROTEÇÃO GLOBAL ---
 // A partir daqui, TODAS as rotas abaixo exigirão um token JWT válido para prosseguir.
