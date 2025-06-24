@@ -1,13 +1,7 @@
-// src/components/os/OSForm.tsx
-import React, { useState, useEffect } from 'react';
+// src/components/os/OSForm.tsx - VERSÃO CORRIGIDA
+import React, { ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { Cliente } from '@/pages/clientes/ClientesPage';
-import { Veiculo } from '@/pages/os/OSFormPage';
-
-interface Usuario {
-  id: number;
-  nome: string;
-}
+import { Cliente, Veiculo, Usuario } from '@/types'; // ✅ IMPORTAÇÃO CENTRALIZADA
 
 export interface OSFormData {
   cliente_id: string | number;
@@ -20,7 +14,8 @@ export interface OSFormData {
 }
 
 interface OSFormProps {
-  initialData: OSFormData;
+  formData: OSFormData;
+  handleChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   clientes: Cliente[];
   veiculos: Veiculo[];
   usuarios: Usuario[];
@@ -28,26 +23,8 @@ interface OSFormProps {
   apiErrors: any[];
 }
 
-export default function OSForm({ initialData, clientes, veiculos, usuarios, onSubmit, apiErrors }: OSFormProps) {
-  const [formData, setFormData] = useState<OSFormData>(initialData);
-
-  useEffect(() => {
-    setFormData(initialData);
-  }, [initialData]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-
-    const newFormData = { ...formData, [name]: value };
-
-    // Se o cliente mudou, reseta o veículo selecionado
-    if (name === 'cliente_id') {
-      newFormData.veiculo_id = '';
-    }
-
-    setFormData(newFormData);
-  };
-
+export default function OSForm({ formData, handleChange, clientes, veiculos, usuarios, onSubmit, apiErrors }: OSFormProps) {
+  // O resto do arquivo permanece EXATAMENTE IGUAL ao que te passei antes...
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
