@@ -12,7 +12,9 @@ interface Usuario {
 
 export interface Veiculo {
   id: number;
+  marca: string;    // ✅ ADICIONADO
   modelo: string;
+  ano: number;      // ✅ ADICIONADO
   placa: string;
 }
 

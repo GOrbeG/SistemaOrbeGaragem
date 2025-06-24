@@ -19,6 +19,7 @@ import Perfil from '../pages/Perfil';
 import CadastrarFuncionario from '../pages/admin/CadastrarFuncionario';
 import ClientesPage from '@/pages/clientes/ClientesPage';
 import ClienteFormPage from '@/pages/clientes/ClienteFormPage';
+import ClienteDetailPage from '@/pages/clientes/ClienteDetailPage';
 
 // Componente que une a proteção e o layout
 const ProtectedLayout = () => {
@@ -54,7 +55,7 @@ const AppContent = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="financeiro" element={<Financeiro />} />
           <Route path="agendamentos" element={<Agendamentos />} />
-          
+          <Route path="clientes/:id" element={<ClienteDetailPage />} />
           <Route path="os" element={<OrdensServico />} />
           {/* ✅ ROTAS ADICIONADAS */}
           <Route path="os/novo" element={<OSFormPage />} />
