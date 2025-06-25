@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../config/db');
 const { body, validationResult } = require('express-validator');
 const registrarHistorico = require('../middlewares/logHistorico');
+const checkPermissao = require('../middlewares/checkPermissao');
 
 // ✅ ROTA ATUALIZADA: Listar todos os itens ou filtrar por ordem_id
 router.get('/', async (req, res) => {
