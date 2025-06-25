@@ -348,58 +348,107 @@ router.get('/visualizar/:token', async (req, res) => {
   }
 });
 
-// Exportar OS em PDF
-router.get('/:id/exportar', async (req, res) => {
+// ✅ ROTA DE EXPORTAÇÃO DE PDF ATUALIZADA
+router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
   try {
     const { id } = req.params;
-    const osResult = await db.query(
-      'SELECT * FROM ordens_servico WHERE id = $1',
-      [id]
-    );
-    const itensResult = await db.query(
-      'SELECT * FROM itens_ordem WHERE ordem_id = $1',
-      [id]
-    );
+
+    // Query principal que une OS, Cliente e Veículo
+    const osQuery = `
+      SELECT 
+        os.*, 
+        c.nome AS cliente_nome, c.email AS cliente_email, c.telefone AS cliente_telefone,
+        v.marca, v.modelo, v.placa, v.ano
+      FROM ordens_servico os
+      LEFT JOIN clientes c ON os.cliente_id = c.id
+      LEFT JOIN veiculos v ON os.veiculo_id = v.id
+      WHERE os.id = $1;
+    `;
+    const osResult = await db.query(osQuery, [id]);
+
+    // Query para os itens da OS
+    const itensResult = await db.query('SELECT * FROM itens_ordem WHERE ordem_id = $1', [id]);
 
     if (osResult.rows.length === 0) {
       return res.status(404).json({ error: 'OS não encontrada' });
     }
 
-    const doc = new PDFDocument();
-    res.setHeader(
-      'Content-disposition',
-      `inline; filename="ordem_servico_${id}.pdf"`
-    );
+    const os = osResult.rows[0];
+    const itens = itensResult.rows;
+
+    const doc = new PDFDocument({ margin: 50 });
+    res.setHeader('Content-disposition', `inline; filename="os_${id}.pdf"`);
     res.setHeader('Content-type', 'application/pdf');
     doc.pipe(res);
 
-    doc.fontSize(20).text('Orbe Garage - Ordem de Serviço', { align: 'center' });
+    // --- Início do Layout do PDF ---
+
+    // Cabeçalho
+    doc.fontSize(20).font('Helvetica-Bold').text('Orbe Garage', { align: 'center' });
+    doc.fontSize(10).font('Helvetica').text('Ordem de Serviço', { align: 'center' });
+    doc.moveDown(2);
+
+    // Informações da OS
+    doc.fontSize(12).font('Helvetica-Bold').text(`OS #${os.id}`, { continued: true });
+    doc.font('Helvetica').text(` - ${new Date(os.data_criacao).toLocaleDateString('pt-BR')}`, { align: 'right' });
+    doc.fontSize(10).fillColor('gray').text(`Status: ${os.status}`);
     doc.moveDown();
 
-    const dados = osResult.rows[0];
-    doc.fontSize(12).text(`ID: ${dados.id}`);
-    doc.text(`Status: ${dados.status}`);
-    doc.text(`Descrição: ${dados.descricao}`);
-    doc.text(`Data: ${new Date(dados.data_criacao).toLocaleDateString()}`);
-    doc.moveDown();
+    // Dados do Cliente e Veículo (em colunas)
+    const yPos = doc.y;
+    doc.fontSize(12).font('Helvetica-Bold').text('Dados do Cliente', { width: 250 });
+    doc.font('Helvetica').text(os.cliente_nome || 'N/A');
+    doc.text(os.cliente_email || 'N/A');
+    doc.text(os.cliente_telefone || 'N/A');
 
-    doc.fontSize(14).text('Serviços:', { underline: true });
-    itensResult.rows.forEach((item, index) => {
-      doc.fontSize(12).text(
-        `${index + 1}. ${item.descricao} - R$ ${parseFloat(item.valor).toFixed(2)}`
-      );
+    doc.y = yPos; // Volta para a mesma altura para a segunda coluna
+    doc.fontSize(12).font('Helvetica-Bold').text('Dados do Veículo', { align: 'right' });
+    doc.font('Helvetica').text(`${os.marca || ''} ${os.modelo || ''} ${os.ano || ''}`, { align: 'right' });
+    doc.text(`Placa: ${os.placa || 'N/A'}`, { align: 'right' });
+    doc.moveDown(2);
+
+    // Descrição principal da OS
+    doc.font('Helvetica-Bold').text('Descrição do Problema/Serviço:');
+    doc.font('Helvetica').text(os.descricao, { align: 'justify' });
+    doc.moveDown(2);
+
+    // Tabela de Itens e Serviços
+    doc.font('Helvetica-Bold').text('Itens e Serviços Detalhados:');
+    doc.moveDown();
+    const tableTop = doc.y;
+    const itemX = 50;
+    const valorX = 450;
+    
+    doc.font('Helvetica-Bold').text('Descrição', itemX, tableTop).text('Valor (R$)', valorX, tableTop, { align: 'right' });
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke(); // Linha divisória
+    
+    let currentY = doc.y + 5;
+    itens.forEach(item => {
+        doc.font('Helvetica').fontSize(10).text(item.descricao, itemX, currentY, { width: 380 });
+        doc.text(parseFloat(item.valor).toFixed(2), valorX, currentY, { align: 'right' });
+        currentY += 20;
     });
 
-    const total = itensResult.rows.reduce(
-      (acc, cur) => acc + parseFloat(cur.valor),
-      0
-    );
+    doc.y = currentY > doc.y ? currentY : doc.y; // Garante que a posição Y esteja correta
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
     doc.moveDown();
-    doc.fontSize(14).text(`Total: R$ ${total.toFixed(2)}`, { align: 'right' });
+    
+    // Total
+    doc.fontSize(14).font('Helvetica-Bold').text('Valor Total:', { width: 480, align: 'right' });
+    doc.y -= 16; // Recua um pouco a linha para alinhar o valor
+    doc.text(`R$ ${parseFloat(os.valor_total).toFixed(2)}`, { align: 'right' });
+    doc.moveDown(3);
+
+    // Assinatura
+    doc.moveTo(150, doc.y + 30).lineTo(450, doc.y + 30).stroke();
+    doc.text('Assinatura do Cliente', { align: 'center' });
+
+
+    // --- Fim do Layout ---
 
     doc.end();
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao gerar PDF:", error);
     res.status(500).json({ error: 'Erro ao gerar PDF da OS' });
   }
 });
