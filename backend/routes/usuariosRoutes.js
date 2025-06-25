@@ -11,19 +11,18 @@ const router = express.Router();
 const registrarHistorico = require('../middlewares/logHistorico');
 
 // ✅ NOVA ROTA: Listar todos os usuários (funcionários e administradores)
-router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
-  try {
-    const query = `
-      SELECT id, nome FROM usuarios 
-      WHERE role = 'funcionario' OR role = 'administrador'
-      ORDER BY nome ASC
-    `;
-    const { rows } = await db.query(query);
-    res.json(rows);
-  } catch (error) {
-    console.error("ERRO AO LISTAR USUÁRIOS:", error);
-    res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
-  }
+router.get('/:id', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await db.query('SELECT id, nome, email, role FROM usuarios WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error(`ERRO AO BUSCAR USUÁRIO ${id}:`, error);
+        res.status(500).json({ error: 'Erro interno ao buscar usuário.' });
+    }
 });
 
 // Criar novo usuário (admin ou funcionário)
