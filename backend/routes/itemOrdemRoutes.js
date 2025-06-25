@@ -4,10 +4,20 @@ const db = require('../config/db');
 const { body, validationResult } = require('express-validator');
 const registrarHistorico = require('../middlewares/logHistorico');
 
-// Listar todos os itens de todas as ordens
+// ✅ ROTA ATUALIZADA: Listar todos os itens ou filtrar por ordem_id
 router.get('/', async (req, res) => {
+  const { ordemId } = req.query;
+
   try {
-    const result = await db.query('SELECT * FROM itens_ordem');
+    let query = 'SELECT * FROM itens_ordem';
+    const params = [];
+
+    if (ordemId) {
+      query += ' WHERE ordem_id = $1';
+      params.push(ordemId);
+    }
+    
+    const result = await db.query(query, params);
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar itens de ordem' });
