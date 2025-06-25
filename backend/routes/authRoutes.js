@@ -4,7 +4,7 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs'); // Usando bcryptjs para consistência
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-
+const cors = require('cors');
 const router = express.Router();
 
 // --- ROTA DE LOGIN ---
