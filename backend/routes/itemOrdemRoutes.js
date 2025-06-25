@@ -35,38 +35,57 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Criar novo item para uma ordem de serviço
-router.post(
-  '/',
-  [
-    body('ordem_id').isInt().withMessage('ID da ordem é obrigatório'),
-    body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
-    body('valor').isFloat({ gt: 0 }).withMessage('Valor deve ser numérico e maior que zero')
-  ],
-  async (req, res) => {
-    const erros = validationResult(req);
-    if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
+// ✅ ROTA ATUALIZADA: Criar novo item e ATUALIZAR O TOTAL DA OS
+router.post('/',
+    checkPermissao(['administrador', 'funcionario']),
+    [
+        body('ordem_id').isInt().withMessage('ID da ordem é obrigatório'),
+        body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
+        body('valor').isFloat({ gt: -1 }).withMessage('Valor deve ser numérico') // Permitindo valor 0
+    ],
+    async (req, res) => {
+        const erros = validationResult(req);
+        if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
-    const { ordem_id, descricao, valor } = req.body;
-    try {
-      const result = await db.query(
-        'INSERT INTO itens_ordem (ordem_id, descricao, valor) VALUES ($1, $2, $3) RETURNING *',
-        [ordem_id, descricao, valor]
-      );
+        const { ordem_id, descricao, valor } = req.body;
+        const client = await db.connect(); // Inicia conexão para transação
 
-      await registrarHistorico({
-        usuario_id: req.user.id,
-        acao: 'criar',
-        entidade: 'itens_ordem',
-        entidade_id: result.rows[0].id,
-        dados_novos: result.rows[0]
-      });
+        try {
+            await client.query('BEGIN'); // Começa a transação
 
-      res.status(201).json(result.rows[0]);
-    } catch (error) {
-      res.status(500).json({ error: 'Erro ao criar item' });
+            // 1. Insere o novo item
+            const insertItemQuery = 'INSERT INTO itens_ordem (ordem_id, descricao, valor) VALUES ($1, $2, $3) RETURNING *';
+            const newItemResult = await client.query(insertItemQuery, [ordem_id, descricao, valor]);
+
+            // 2. Recalcula e atualiza o valor_total na tabela ordens_servico
+            const updateTotalQuery = `
+                UPDATE ordens_servico
+                SET valor_total = (SELECT SUM(valor) FROM itens_ordem WHERE ordem_id = $1)
+                WHERE id = $1;
+            `;
+            await client.query(updateTotalQuery, [ordem_id]);
+
+            await client.query('COMMIT'); // Confirma a transação se tudo deu certo
+            
+            // Opcional: Registrar histórico
+            await registrarHistorico({
+                usuario_id: req.user.id,
+                acao: 'criar',
+                entidade: 'itens_ordem',
+                entidade_id: newItemResult.rows[0].id,
+                dados_novos: newItemResult.rows[0]
+            });
+            
+            res.status(201).json(newItemResult.rows[0]);
+
+        } catch (error) {
+            await client.query('ROLLBACK'); // Desfaz tudo se der erro
+            console.error("Erro ao criar item:", error);
+            res.status(500).json({ error: 'Erro ao criar item' });
+        } finally {
+            client.release(); // Libera a conexão
+        }
     }
-  }
 );
 
 // Atualizar item da ordem
