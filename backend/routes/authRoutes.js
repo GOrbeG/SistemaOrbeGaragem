@@ -9,7 +9,10 @@ const router = express.Router();
 
 // --- ROTA DE LOGIN ---
 // ✅ Lógica de login movida para cá
-router.post('/login', 
+
+router.options('/login', cors(corsOptions));
+
+router.post('/login', cors(corsOptions),
   [
     body('email').isEmail().withMessage('E-mail inválido'),
     body('senha').notEmpty().withMessage('Senha é obrigatória')
