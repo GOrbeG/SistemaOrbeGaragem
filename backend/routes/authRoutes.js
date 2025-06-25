@@ -1,18 +1,24 @@
-// backend/src/routes/authRoutes.js - VERSÃO FINAL UNIFICADA
+// backend/src/routes/authRoutes.js - VERSÃO FINAL COM TODAS AS CORREÇÕES
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs'); // Usando bcryptjs para consistência
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const cors = require('cors');
+
 const router = express.Router();
 
+// ✅ CORREÇÃO: Definição do corsOptions que estava faltando
+const corsOptions = {
+    origin: 'https://sistemaorbegaragem-1.onrender.com', 
+    optionsSuccessStatus: 200
+};
+
 // --- ROTA DE LOGIN ---
-// ✅ Lógica de login movida para cá
+// Habilita explicitamente a "sondagem" de segurança (preflight) para a rota de login
+router.options('/login', cors(corsOptions)); 
 
-router.options('/login', cors(corsOptions));
-
-router.post('/login', cors(corsOptions),
+router.post('/login', cors(corsOptions), // Garante o CORS na rota principal também
   [
     body('email').isEmail().withMessage('E-mail inválido'),
     body('senha').notEmpty().withMessage('Senha é obrigatória')
@@ -63,49 +69,35 @@ const validacaoCadastroCliente = [
   body('telefone').notEmpty().withMessage('Telefone é obrigatório')
 ];
 
-router.post('/register-client', validacaoCadastroCliente, async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { nome, email, senha, cpf_cnpj, telefone, data_nascimento, cep, logradouro, numero, bairro, cidade, estado } = req.body;
-  
-  const client = await db.connect();
-  try {
-    await client.query('BEGIN');
-
-    const hashedPassword = await bcrypt.hash(senha, 10);
-    const userQuery = `
-      INSERT INTO usuarios (nome, email, senha, role, cpf)
-      VALUES ($1, $2, $3, 'cliente', $4)
-      RETURNING id;
-    `;
-    const userResult = await client.query(userQuery, [nome, email, hashedPassword, cpf_cnpj]);
-    const newUserId = userResult.rows[0].id;
-
-    const clienteQuery = `
-      INSERT INTO clientes (nome, email, telefone, cpf_cnpj, tipo_pessoa, data_nascimento, cep, logradouro, numero, bairro, cidade, estado, usuario_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-      RETURNING *;
-    `;
-    const tipoPessoa = (cpf_cnpj || '').length > 14 ? 'PJ' : 'PF';
-    
-    await client.query(clienteQuery, [nome, email, telefone, cpf_cnpj, tipoPessoa, data_nascimento || null, cep, logradouro, numero, bairro, cidade, estado, newUserId]);
-
-    await client.query('COMMIT');
-    res.status(201).json({ message: 'Cadastro realizado com sucesso! Você já pode fazer o login.' });
-
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.error("ERRO NA TRANSAÇÃO DE CADASTRO:", error);
-    if (error.code === '23505') {
-      return res.status(409).json({ error: `Já existe um cadastro com este ${error.constraint.includes('email') ? 'email' : 'CPF/CNPJ'}.` });
+router.post('/register-client', cors(corsOptions), validacaoCadastroCliente, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    res.status(500).json({ error: 'Ocorreu um erro inesperado durante o cadastro.' });
-  } finally {
-    client.release();
-  }
+    const { nome, email, senha, cpf_cnpj, telefone, data_nascimento, cep, logradouro, numero, bairro, cidade, estado } = req.body;
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const hashedPassword = await bcrypt.hash(senha, 10);
+      const userQuery = `INSERT INTO usuarios (nome, email, senha, role, cpf) VALUES ($1, $2, $3, 'cliente', $4) RETURNING id;`;
+      const userResult = await client.query(userQuery, [nome, email, hashedPassword, cpf_cnpj]);
+      const newUserId = userResult.rows[0].id;
+      const clienteQuery = `INSERT INTO clientes (nome, email, telefone, cpf_cnpj, tipo_pessoa, data_nascimento, cep, logradouro, numero, bairro, cidade, estado, usuario_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *;`;
+      const tipoPessoa = (cpf_cnpj || '').length > 14 ? 'PJ' : 'PF';
+      await client.query(clienteQuery, [nome, email, telefone, cpf_cnpj, tipoPessoa, data_nascimento || null, cep, logradouro, numero, bairro, cidade, estado, newUserId]);
+      await client.query('COMMIT');
+      res.status(201).json({ message: 'Cadastro realizado com sucesso! Você já pode fazer o login.' });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error("ERRO NA TRANSAÇÃO DE CADASTRO:", error);
+      if (error.code === '23505') {
+        return res.status(409).json({ error: `Já existe um cadastro com este ${error.constraint.includes('email') ? 'email' : 'CPF/CNPJ'}.` });
+      }
+      res.status(500).json({ error: 'Ocorreu um erro inesperado durante o cadastro.' });
+    } finally {
+      client.release();
+    }
 });
+
 
 module.exports = router;
