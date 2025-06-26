@@ -1,28 +1,45 @@
-// src/pages/os/OSFormPage.tsx - VERSÃO CORRIGIDA
+// src/pages/os/OSFormPage.tsx - VERSÃO INTELIGENTE QUE LÊ A URL
 import { useEffect, useState, ChangeEvent } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom'; // ✅ Importado useLocation
 import { api } from '@/services/api';
 import OSForm, { OSFormData } from '@/components/os/OSForm';
-import { Cliente, Veiculo, Usuario } from '@/types'; // ✅ IMPORTAÇÃO CENTRALIZADA
+import { Cliente, Veiculo, Usuario } from '@/types';
 
-// As interfaces foram movidas para src/types/index.ts
-
-const initialState: OSFormData = {
+// O estado inicial padrão
+const defaultInitialState: OSFormData = {
   cliente_id: '',
   veiculo_id: '',
   usuario_id: '',
-  status: 'Aberta',
+  status: 'Aberta', // Status padrão para uma OS normal
   descricao: '',
   valor_total: 0,
   data_agendada: '',
 };
 
 export default function OSFormPage() {
-  // O resto do arquivo permanece EXATAMENTE IGUAL ao que te passei antes
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ Hook para ler a URL
   const isEditMode = Boolean(id);
-  const [formData, setFormData] = useState<OSFormData>(initialState);
+
+  // ✅ LÓGICA ATUALIZADA: Define o estado inicial de forma inteligente
+  const getInitialState = (): OSFormData => {
+    const params = new URLSearchParams(location.search);
+    const dataFromCalendar = params.get('data');
+
+    if (dataFromCalendar) {
+      // Se veio do calendário, o status é 'Agendada'
+      return {
+        ...defaultInitialState,
+        status: 'Agendada',
+        data_agendada: dataFromCalendar.split('T')[0], // Garante o formato YYYY-MM-DD
+      };
+    }
+    // Senão, usa o padrão normal
+    return defaultInitialState;
+  };
+
+  const [formData, setFormData] = useState<OSFormData>(getInitialState());
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -32,6 +49,7 @@ export default function OSFormPage() {
   useEffect(() => {
     api.get('/api/clientes').then(response => setClientes(response.data));
     api.get('/api/usuarios').then(response => setUsuarios(response.data));
+
     if (isEditMode) {
       setLoading(true);
       api.get(`/api/os/${id}`)
@@ -66,13 +84,18 @@ export default function OSFormPage() {
 
   const handleSubmit = async (data: OSFormData) => {
     setApiErrors([]);
+    // Garante que o valor total seja numérico
+    const finalData = { ...data, valor_total: Number(data.valor_total) };
+
     const apiCall = isEditMode
-      ? api.put(`/api/os/${id}`, data)
-      : api.post('/api/os', data);
+      ? api.put(`/api/os/${id}`, finalData)
+      : api.post('/api/os', finalData);
+
     try {
       await apiCall;
       alert(`OS ${isEditMode ? 'atualizada' : 'criada'} com sucesso!`);
-      navigate('/os');
+      // Se era um agendamento, volta para o calendário. Senão, para a lista de OS.
+      navigate(finalData.status === 'Agendada' ? '/agendamentos' : '/os');
     } catch (error: any) {
       const errors = error.response?.data?.errors || [{ msg: 'Ocorreu um erro.' }];
       setApiErrors(errors);
@@ -83,7 +106,9 @@ export default function OSFormPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">{isEditMode ? 'Editar Ordem de Serviço' : 'Nova Ordem de Serviço'}</h1>
+      <h1 className="text-3xl font-bold text-gray-800">
+        {isEditMode ? 'Editar Ordem de Serviço' : 'Nova Ordem de Serviço'}
+      </h1>
       <OSForm
         formData={formData}
         handleChange={handleChange}
