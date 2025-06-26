@@ -69,6 +69,9 @@ router.post(
       .withMessage('Data agendada inválida'),
   ],
   async (req, res) => {
+    // ✅ LINHA DE DEBUG ADICIONADA AQUI
+    console.log('DADOS RECEBIDOS PARA CRIAR OS:', req.body);
+
     const erros = validationResult(req);
     if (!erros.isEmpty()) {
       return res.status(400).json({ erros: erros.array() });

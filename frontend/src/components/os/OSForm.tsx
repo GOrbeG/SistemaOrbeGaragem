@@ -1,7 +1,7 @@
-// src/components/os/OSForm.tsx - VERSÃO CORRIGIDA
+// src/components/os/OSForm.tsx - VERSÃO SIMPLIFICADA E CONTROLADA
 import React, { ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { Cliente, Veiculo, Usuario } from '@/types'; // ✅ IMPORTAÇÃO CENTRALIZADA
+import { Cliente, Veiculo, Usuario } from '@/types';
 
 export interface OSFormData {
   cliente_id: string | number;
@@ -10,7 +10,7 @@ export interface OSFormData {
   status: string;
   descricao: string;
   valor_total: number;
-  data_agendada?: string;
+  data_agendada?: string | null;
 }
 
 interface OSFormProps {
@@ -19,27 +19,30 @@ interface OSFormProps {
   clientes: Cliente[];
   veiculos: Veiculo[];
   usuarios: Usuario[];
-  onSubmit: (data: OSFormData) => void;
+  onSubmit: () => void; // ✅ CORREÇÃO: Não precisa mais do argumento 'data'
   apiErrors: any[];
 }
 
 export default function OSForm({ formData, handleChange, clientes, veiculos, usuarios, onSubmit, apiErrors }: OSFormProps) {
-  // O resto do arquivo permanece EXATAMENTE IGUAL ao que te passei antes...
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit(); // ✅ CORREÇÃO: Apenas chama a função do pai
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-6">
+      {/* O resto do seu formulário JSX permanece o mesmo */}
       {apiErrors.length > 0 && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
-          <strong className="font-bold">Erro!</strong>
-          <ul>{apiErrors.map((error, index) => <li key={index}>{error.msg}</li>)}</ul>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-4" role="alert">
+    <strong className="font-bold">Ocorreram erros:</strong>
+    <ul className="mt-2 list-disc list-inside">
+      {apiErrors.map((error, index) => <li key={index}>{error.msg}</li>)}
+    </ul>
+  </div>
+)}
+      {/* ... */}
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="cliente_id" className="block text-sm font-medium text-gray-700">Cliente</label>
           <select name="cliente_id" id="cliente_id" value={formData.cliente_id} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md shadow-sm bg-white">

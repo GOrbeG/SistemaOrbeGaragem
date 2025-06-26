@@ -1,16 +1,15 @@
-// src/pages/os/OSFormPage.tsx - VERSÃO INTELIGENTE QUE LÊ A URL
+// src/pages/os/OSFormPage.tsx - VERSÃO COM SUBMIT CORRIGIDO
 import { useEffect, useState, ChangeEvent } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom'; // ✅ Importado useLocation
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '@/services/api';
 import OSForm, { OSFormData } from '@/components/os/OSForm';
 import { Cliente, Veiculo, Usuario } from '@/types';
 
-// O estado inicial padrão
 const defaultInitialState: OSFormData = {
   cliente_id: '',
   veiculo_id: '',
   usuario_id: '',
-  status: 'Aberta', // Status padrão para uma OS normal
+  status: 'Aberta',
   descricao: '',
   valor_total: 0,
   data_agendada: '',
@@ -19,23 +18,19 @@ const defaultInitialState: OSFormData = {
 export default function OSFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ Hook para ler a URL
+  const location = useLocation();
   const isEditMode = Boolean(id);
 
-  // ✅ LÓGICA ATUALIZADA: Define o estado inicial de forma inteligente
   const getInitialState = (): OSFormData => {
     const params = new URLSearchParams(location.search);
     const dataFromCalendar = params.get('data');
-
     if (dataFromCalendar) {
-      // Se veio do calendário, o status é 'Agendada'
       return {
         ...defaultInitialState,
         status: 'Agendada',
-        data_agendada: dataFromCalendar.split('T')[0], // Garante o formato YYYY-MM-DD
+        data_agendada: dataFromCalendar.split('T')[0],
       };
     }
-    // Senão, usa o padrão normal
     return defaultInitialState;
   };
 
@@ -66,8 +61,9 @@ export default function OSFormPage() {
 
   useEffect(() => {
     if (formData.cliente_id) {
-      api.get(`/api/veiculos?clienteId=${formData.cliente_id}`)
-         .then(response => setVeiculos(response.data));
+      api.get(`/api/veiculos?clienteId=${formData.cliente_id}`).then(response => {
+        setVeiculos(response.data);
+      });
     } else {
       setVeiculos([]);
     }
@@ -75,26 +71,24 @@ export default function OSFormPage() {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const newFormData = { ...formData, [name]: value };
-    if (name === 'cliente_id') {
-      newFormData.veiculo_id = '';
-    }
-    setFormData(newFormData);
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (data: OSFormData) => {
+  // ✅ CORREÇÃO CRÍTICA: A função agora não recebe argumentos e usa o 'formData' do estado.
+  const handleSubmit = async () => {
     setApiErrors([]);
-    // Garante que o valor total seja numérico
-    const finalData = { ...data, valor_total: Number(data.valor_total) };
+    const finalData = { ...formData, valor_total: Number(formData.valor_total) };
+
+    if (!finalData.data_agendada) {
+        finalData.data_agendada = null;
+    }
 
     const apiCall = isEditMode
       ? api.put(`/api/os/${id}`, finalData)
       : api.post('/api/os', finalData);
-
     try {
       await apiCall;
       alert(`OS ${isEditMode ? 'atualizada' : 'criada'} com sucesso!`);
-      // Se era um agendamento, volta para o calendário. Senão, para a lista de OS.
       navigate(finalData.status === 'Agendada' ? '/agendamentos' : '/os');
     } catch (error: any) {
       const errors = error.response?.data?.errors || [{ msg: 'Ocorreu um erro.' }];
