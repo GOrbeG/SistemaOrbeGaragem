@@ -109,13 +109,20 @@ router.put('/:id', checkPermissao(['administrador', 'funcionario', 'cliente']), 
   }
 });
 
-// Listar usuários
-router.get('/', checkPermissao(['administrador']), async (req, res) => {
+// ✅ ROTA CORRIGIDA: Lista apenas usuários que podem ser técnicos e usa o nome de coluna correto
+router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
   try {
-    const result = await db.query('SELECT id, nome, email, cpf, role, criado_em FROM usuarios ORDER BY nome');
-    res.json(result.rows);
+    // Esta query agora busca apenas funcionários/admins e usa 'created_at'
+    const query = `
+      SELECT id, nome, email, cpf, role, created_at FROM usuarios 
+      WHERE role = 'funcionario' OR role = 'administrador'
+      ORDER BY nome ASC
+    `;
+    const { rows } = await db.query(query);
+    res.json(rows);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar usuários' });
+    console.error("ERRO AO LISTAR USUÁRIOS TÉCNICOS:", error);
+    res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
   }
 });
 
