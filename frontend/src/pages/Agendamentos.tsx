@@ -33,7 +33,6 @@ export default function Agendamentos() {
         id: ag.id.toString(),
         title: `${ag.cliente_nome} - ${ag.veiculo_modelo}`,
         start: ag.data_agendada,
-        allDay: true // Considera o evento como dia inteiro para simplificar
       }));
       successCallback(eventosFormatados); // Informa ao calendário sobre os novos eventos
     })

@@ -76,8 +76,16 @@ export default function OSForm({ formData, handleChange, clientes, veiculos, usu
           </select>
         </div>
          <div>
-          <label htmlFor="data_agendada" className="block text-sm font-medium text-gray-700">Data de Agendamento</label>
-          <input type="date" name="data_agendada" id="data_agendada" value={formData.data_agendada || ''} onChange={handleChange} className="mt-1 block w-full p-2 border rounded-md shadow-sm" />
+          <label htmlFor="data_agendada">Data e Hora do Agendamento</label>
+          {/* ✅ MUDANÇA CRÍTICA: tipo do input alterado para data e hora */}
+          <input 
+            type="datetime-local" 
+            name="data_agendada" 
+            id="data_agendada" 
+            value={formData.data_agendada?.substring(0, 16) || ''} // Formata para o input datetime-local
+            onChange={handleChange} 
+            className="mt-1 block w-full p-2 border rounded-md shadow-sm"
+          />
         </div>
         <div>
           <label htmlFor="valor_total" className="block text-sm font-medium text-gray-700">Valor Total (R$)</label>
