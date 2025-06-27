@@ -65,7 +65,6 @@ router.post(
     body('data_agendada')
       .optional()
       .isISO8601()
-      .toDate()
       .withMessage('Data agendada inválida'),
   ],
   async (req, res) => {
@@ -198,7 +197,6 @@ router.put(
     body('data_agendada')
       .optional()
       .isISO8601()
-      .toDate()
       .withMessage('Data agendada inválida'),
   ],
   async (req, res) => {
