@@ -1,49 +1,53 @@
-// src/pages/Agendamentos.tsx - VERSÃO COM CALENDÁRIO FUNCIONAL
-import { useState, useEffect } from 'react';
+// src/pages/Agendamentos.tsx - VERSÃO FINAL E DINÂMICA
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction'; // Plugin para interações como clique em datas
+import interactionPlugin from '@fullcalendar/interaction';
 import { api } from '@/services/api';
 
-// Interface para os eventos que vêm da API
 interface AgendamentoEvento {
   id: number;
   data_agendada: string;
   cliente_nome: string;
   veiculo_modelo: string;
-  // Adicione mais campos se sua API retornar
 }
 
 export default function Agendamentos() {
-  const [eventos, setEventos] = useState([]);
   const navigate = useNavigate();
+  const calendarRef = useRef<FullCalendar>(null);
 
-  useEffect(() => {
-    // Busca os agendamentos (OS com status 'agendada') do backend
-    api.get('/api/agenda/agendamentos') // Usando a rota do seu agendaRoutes.js
-      .then(response => {
-        // Mapeia os dados da API para o formato que o FullCalendar entende
-        const eventosFormatados = response.data.map((ag: AgendamentoEvento) => ({
-          id: ag.id.toString(),
-          title: `${ag.cliente_nome} - ${ag.veiculo_modelo}`,
-          start: ag.data_agendada,
-        }));
-        setEventos(eventosFormatados);
-      })
-      .catch(error => console.error("Erro ao buscar agendamentos:", error));
-  }, []);
+  // ✅ FUNÇÃO DINÂMICA PARA BUSCAR EVENTOS
+  // Esta função é chamada pelo FullCalendar sempre que a visão muda (ex: próximo mês)
+  const fetchEventos = (fetchInfo: any, successCallback: any, failureCallback: any) => {
+    api.get('/api/agenda/agendamentos', {
+      params: {
+        // Envia as datas de início e fim da visão atual do calendário para o backend
+        data_inicio: fetchInfo.startStr,
+        data_fim: fetchInfo.endStr,
+      }
+    })
+    .then(response => {
+      const eventosFormatados = response.data.map((ag: AgendamentoEvento) => ({
+        id: ag.id.toString(),
+        title: `${ag.cliente_nome} - ${ag.veiculo_modelo}`,
+        start: ag.data_agendada,
+        allDay: true // Considera o evento como dia inteiro para simplificar
+      }));
+      successCallback(eventosFormatados); // Informa ao calendário sobre os novos eventos
+    })
+    .catch(error => {
+      console.error("Erro ao buscar agendamentos:", error);
+      failureCallback(error); // Informa ao calendário que a busca falhou
+    });
+  };
 
-  // Função para lidar com o clique em um evento existente
   const handleEventClick = (clickInfo: any) => {
-    // Navega para a página de detalhes da OS correspondente
     navigate(`/os/${clickInfo.event.id}`);
   };
 
-  // Função para lidar com o clique em uma data vazia no calendário
   const handleDateClick = (arg: any) => {
-    // Navega para a página de nova OS, passando a data clicada
     navigate(`/os/novo?data=${arg.dateStr}`);
   };
 
@@ -53,21 +57,20 @@ export default function Agendamentos() {
         <h1 className="text-3xl font-bold">Agenda de Serviços</h1>
       </div>
       
-      {/* Renderiza o componente do calendário */}
       <FullCalendar
+        ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth" // Visão inicial
+        initialView="dayGridMonth"
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay' // Botões para mudar de visão
+          right: 'dayGridMonth,timeGridWeek'
         }}
-        events={eventos}
-        eventClick={handleEventClick} // Ação ao clicar em um evento
-        dateClick={handleDateClick}   // Ação ao clicar em um dia
-        editable={true} // Permite arrastar eventos (funcionalidade futura)
-        droppable={true}
-        locale='pt-br' // Traduz para português
+        // ✅ A MUDANÇA MAIS IMPORTANTE: Usa a função para buscar eventos
+        events={fetchEventos}
+        eventClick={handleEventClick}
+        dateClick={handleDateClick}
+        locale='pt-br'
         buttonText={{
             today:    'Hoje',
             month:    'Mês',
