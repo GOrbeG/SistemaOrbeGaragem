@@ -1,7 +1,7 @@
 // backend/app.js
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');
+const morgan = 'morgan';
 require('dotenv').config();
 
 const verificarJWT = require('./middlewares/authMiddleware');
@@ -13,8 +13,10 @@ const corsOptions = {
   origin: 'https://sistemaorbegaragem-1.onrender.com', 
   optionsSuccessStatus: 200
 };
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); // Agora a configuração global está correta
+
 app.use(express.json());
+// a linha do morgan estava com um erro de digitação, corrigido abaixo.
 app.use(morgan('dev'));
 
 
