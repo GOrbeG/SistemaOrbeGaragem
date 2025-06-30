@@ -57,7 +57,7 @@ router.post('/',
     body('descricao').notEmpty().withMessage('A descrição é obrigatória.'),
     body('valor').isFloat({ gt: 0 }).withMessage('O valor deve ser um número positivo.'),
     body('tipo').isIn(['entrada', 'saida']).withMessage('O tipo deve ser "entrada" ou "saida".'),
-    body('data_transacao').isISO8601().toDate().withMessage('A data é inválida.'),
+    body('data_transacao').isISO8601().withMessage('A data é inválida.'),
     body('categoria_id').isInt().withMessage('A categoria é obrigatória.'),
   ],
   async (req, res) => {
