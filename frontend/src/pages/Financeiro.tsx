@@ -1,9 +1,11 @@
-// src/pages/Financeiro.tsx
+// src/pages/Financeiro.tsx - VERSÃO FINAL COM ABAS
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '@/services/api';
 import TransacaoFormModal from '@/components/financeiro/TransacaoFormModal';
 import { PlusCircle, MinusCircle } from 'lucide-react';
+import CategoriasPage from './financeiro/CategoriasPage'; // Importa nossa nova página de categorias
 
+// --- Interfaces ---
 interface Transacao {
     id: number;
     descricao: string;
@@ -13,14 +15,14 @@ interface Transacao {
     categoria_nome: string;
 }
 
-export default function FinanceiroPage() {
+// --- Sub-componente para a visão de Lançamentos ---
+// Movemos a lógica original para este componente para manter o código organizado
+const LancamentosView = () => {
     const [transacoes, setTransacoes] = useState<Transacao[]>([]);
     const [loading, setLoading] = useState(true);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState<'entrada' | 'saida'>('entrada');
 
-    // Função para buscar as transações
     const fetchTransacoes = () => {
         setLoading(true);
         api.get('/api/transacoes-financeiras')
@@ -29,20 +31,14 @@ export default function FinanceiroPage() {
             .finally(() => setLoading(false));
     };
 
-    // Busca os dados quando a página carrega
     useEffect(() => {
         fetchTransacoes();
     }, []);
     
-    // Calcula os totais para os cards de resumo
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
         const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
         const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
-        return {
-            totalEntradas: entradas,
-            totalSaidas: saidas,
-            saldo: entradas - saidas
-        };
+        return { totalEntradas: entradas, totalSaidas: saidas, saldo: entradas - saidas };
     }, [transacoes]);
 
     const handleOpenModal = (tipo: 'entrada' | 'saida') => {
@@ -52,38 +48,19 @@ export default function FinanceiroPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-gray-800">Gestão Financeira</h1>
-            
-            {/* Cards de Resumo */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-green-100 p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-green-800">Receitas no Período</h3>
-                    <p className="text-3xl font-bold text-green-700">{totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                </div>
-                <div className="bg-red-100 p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-red-800">Despesas no Período</h3>
-                    <p className="text-3xl font-bold text-red-700">{totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                </div>
-                <div className="bg-blue-100 p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-blue-800">Saldo Final</h3>
-                    <p className="text-3xl font-bold text-blue-700">{saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                </div>
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-green-100 p-6 rounded-lg shadow"><h3 className="text-lg font-semibold text-green-800">Receitas</h3><p className="text-3xl font-bold text-green-700">{totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
+                <div className="bg-red-100 p-6 rounded-lg shadow"><h3 className="text-lg font-semibold text-red-800">Despesas</h3><p className="text-3xl font-bold text-red-700">{totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
+                <div className="bg-blue-100 p-6 rounded-lg shadow"><h3 className="text-lg font-semibold text-blue-800">Saldo</h3><p className="text-3xl font-bold text-blue-700">{saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
             </div>
 
-            {/* Barra de Ações e Filtros */}
-            <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
-                <div>{/* Filtros podem ser adicionados aqui no futuro */}</div>
+            <div className="bg-white p-4 rounded-lg shadow-md flex justify-end items-center">
                 <div className="flex gap-4">
-                    <button onClick={() => handleOpenModal('entrada')} className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold">
-                        <PlusCircle size={20} /> Nova Receita
-                    </button>
-                    <button onClick={() => handleOpenModal('saida')} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold">
-                        <MinusCircle size={20} /> Nova Despesa
-                    </button>
+                    <button onClick={() => handleOpenModal('entrada')} className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"><PlusCircle size={20} /> Nova Receita</button>
+                    <button onClick={() => handleOpenModal('saida')} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"><MinusCircle size={20} /> Nova Despesa</button>
                 </div>
             </div>
             
-            {/* Tabela de Transações */}
             <div className="bg-white shadow-md rounded-lg overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -114,13 +91,49 @@ export default function FinanceiroPage() {
                 </table>
             </div>
 
-            {/* O Modal de Formulário */}
-            <TransacaoFormModal 
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={fetchTransacoes}
-                tipo={modalType}
-            />
+            <TransacaoFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={fetchTransacoes} tipo={modalType} />
+        </div>
+    );
+};
+
+
+// --- Componente principal da página Financeiro ---
+export default function FinanceiroPage() {
+    const [activeTab, setActiveTab] = useState<'lancamentos' | 'categorias'>('lancamentos');
+
+    return (
+        <div className="space-y-6">
+            <h1 className="text-3xl font-bold text-gray-800">Gestão Financeira</h1>
+            
+            {/* Navegação por Abas */}
+            <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <button
+                        onClick={() => setActiveTab('lancamentos')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'lancamentos' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                    >
+                        Lançamentos
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('categorias')}
+                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'categorias' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                    >
+                        Gerenciar Categorias
+                    </button>
+                    <button
+                        disabled // Desabilitado por enquanto
+                        className="py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 cursor-not-allowed"
+                    >
+                        Relatórios (em breve)
+                    </button>
+                </nav>
+            </div>
+
+            {/* Conteúdo da Aba Ativa */}
+            <div className="pt-4">
+                {activeTab === 'lancamentos' && <LancamentosView />}
+                {activeTab === 'categorias' && <CategoriasPage />}
+            </div>
         </div>
     );
 }
