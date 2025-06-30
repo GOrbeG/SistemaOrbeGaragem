@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { api } from '@/services/api';
 import TransacaoFormModal from '@/components/financeiro/TransacaoFormModal';
 import { PlusCircle, MinusCircle } from 'lucide-react';
-import CategoriasPage from './financeiro/CategoriasPage'; // Importa nossa nova página de categorias
+import CategoriasPage from './financeiro/CategoriasPage'; // Importa nossa página de categorias
 
 // --- Interfaces ---
 interface Transacao {
@@ -16,7 +16,6 @@ interface Transacao {
 }
 
 // --- Sub-componente para a visão de Lançamentos ---
-// Movemos a lógica original para este componente para manter o código organizado
 const LancamentosView = () => {
     const [transacoes, setTransacoes] = useState<Transacao[]>([]);
     const [loading, setLoading] = useState(true);
@@ -54,7 +53,8 @@ const LancamentosView = () => {
                 <div className="bg-blue-100 p-6 rounded-lg shadow"><h3 className="text-lg font-semibold text-blue-800">Saldo</h3><p className="text-3xl font-bold text-blue-700">{saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md flex justify-end items-center">
+            <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                <div>{/* Espaço para futuros filtros */}</div>
                 <div className="flex gap-4">
                     <button onClick={() => handleOpenModal('entrada')} className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"><PlusCircle size={20} /> Nova Receita</button>
                     <button onClick={() => handleOpenModal('saida')} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"><MinusCircle size={20} /> Nova Despesa</button>
@@ -80,7 +80,7 @@ const LancamentosView = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{t.descricao}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{t.categoria_nome}</td>
                                 <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold text-right ${t.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {t.tipo === 'saida' && '- '}{t.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    {t.tipo === 'saida' && '- '}{Number(t.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </td>
                             </tr>
                         ))}
@@ -105,7 +105,7 @@ export default function FinanceiroPage() {
         <div className="space-y-6">
             <h1 className="text-3xl font-bold text-gray-800">Gestão Financeira</h1>
             
-            {/* Navegação por Abas */}
+            {/* ✅ Navegação por Abas */}
             <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     <button
@@ -129,7 +129,7 @@ export default function FinanceiroPage() {
                 </nav>
             </div>
 
-            {/* Conteúdo da Aba Ativa */}
+            {/* ✅ Conteúdo da Aba Ativa */}
             <div className="pt-4">
                 {activeTab === 'lancamentos' && <LancamentosView />}
                 {activeTab === 'categorias' && <CategoriasPage />}
