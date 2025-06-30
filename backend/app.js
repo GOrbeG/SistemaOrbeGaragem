@@ -49,6 +49,8 @@ app.use('/api/relatorios', require('./routes/relatoriosRoutes'));
 app.use('/api/tecnicos', require('./routes/tecnicosRoutes'));
 app.use('/api/itens-ordem', require('./routes/itemOrdemRoutes'));
 app.use('/api/agenda', require('./routes/agendaRoutes'));
+app.use('/api/categorias-financeiras', require('./routes/categoriasRoutes'));
+app.use('/api/transacoes-financeiras', require('./routes/transacoesRoutes'));
 
 
 // Rota raiz apenas para checagem de status
