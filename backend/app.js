@@ -1,7 +1,7 @@
 // backend/app.js
 const express = require('express');
 const cors = require('cors');
-const morgan = 'morgan';
+const morgan = require('morgan');
 require('dotenv').config();
 
 const verificarJWT = require('./middlewares/authMiddleware');
