@@ -4,6 +4,7 @@ import { api } from '@/services/api';
 import TransacaoFormModal from '@/components/financeiro/TransacaoFormModal';
 import { PlusCircle, MinusCircle } from 'lucide-react';
 import CategoriasPage from './financeiro/CategoriasPage'; // Importa nossa página de categorias
+import RelatoriosView from './financeiro/RelatoriosView';
 
 // --- Interfaces ---
 interface Transacao {
@@ -99,7 +100,20 @@ const LancamentosView = () => {
 
 // --- Componente principal da página Financeiro ---
 export default function FinanceiroPage() {
-    const [activeTab, setActiveTab] = useState<'lancamentos' | 'categorias'>('lancamentos');
+    const [activeTab, setActiveTab] = useState<'lancamentos' | 'categorias' | 'relatorios'>('lancamentos');
+
+    const renderContent = () => {
+        switch(activeTab) {
+            case 'lancamentos':
+                return <LancamentosView />;
+            case 'categorias':
+                return <CategoriasPage />;
+            case 'relatorios': // ✅ ADICIONA O CASO PARA RELATÓRIOS
+                return <RelatoriosView />;
+            default:
+                return <LancamentosView />;
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -120,20 +134,14 @@ export default function FinanceiroPage() {
                     >
                         Gerenciar Categorias
                     </button>
-                    <button
-                        disabled // Desabilitado por enquanto
-                        className="py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 cursor-not-allowed"
-                    >
-                        Relatórios (em breve)
-                    </button>
+                    <button onClick={() => setActiveTab('relatorios')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'relatorios' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Relatórios</button>
                 </nav>
             </div>
 
             {/* ✅ Conteúdo da Aba Ativa */}
             <div className="pt-4">
-                {activeTab === 'lancamentos' && <LancamentosView />}
-                {activeTab === 'categorias' && <CategoriasPage />}
-            </div>
+            {renderContent()}
+             </div>
         </div>
     );
 }
