@@ -12,13 +12,20 @@ const enviarEmail = require('../utils/emailService');
 const { confirmacaoAgendamento } = require('../utils/emailTemplates');
 
 // Listar todas as ordens de serviço
-router.get(
-  '/',
-  checkPermissao(['administrador', 'funcionario']),
-  async (req, res) => {
+router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
+    const { clienteId } = req.query; // Pega o clienteId da URL
     try {
-      const result = await db.query('SELECT * FROM ordens_servico');
-      res.json(result.rows);
+      let query = 'SELECT * FROM ordens_servico ORDER BY data_criacao DESC';
+      const params = [];
+
+      // Se um clienteId for fornecido, modifica a query para filtrar
+      if (clienteId) {
+        query = 'SELECT * FROM ordens_servico WHERE cliente_id = $1 ORDER BY data_criacao DESC';
+        params.push(clienteId);
+      }
+
+      const { rows } = await db.query(query, params);
+      res.json(rows);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Erro ao buscar ordens de serviço' });
