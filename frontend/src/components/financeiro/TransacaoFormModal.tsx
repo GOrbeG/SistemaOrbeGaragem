@@ -27,7 +27,7 @@ interface Props {
 }
 
 export default function TransacaoFormModal({ isOpen, onClose, onSave, tipo }: Props) {
-  const { register, handleSubmit, reset } = useForm<TransacaoFormData>();
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<TransacaoFormData>();
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
   // Busca as categorias do tipo correto (entradas ou saídas) quando o modal abre
@@ -61,28 +61,45 @@ export default function TransacaoFormModal({ isOpen, onClose, onSave, tipo }: Pr
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 overflow-y-auto p-8 pt-12">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          {tipo === 'entrada' ? 'Nova Receita' : 'Nova Despesa'}
-        </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <input {...register('descricao', { required: true })} placeholder="Descrição" className="w-full p-2 border rounded" />
-          <input {...register('valor', { required: true, valueAsNumber: true })} type="number" step="0.01" placeholder="Valor (R$)" className="w-full p-2 border rounded" />
-          <input {...register('data_transacao', { required: true })} type="date" className="w-full p-2 border rounded" />
-          <select {...register('categoria_id', { required: true })} className="w-full p-2 border rounded bg-white">
-            <option value="">Selecione a Categoria</option>
-            {categorias.map(cat => <option key={cat.id} value={cat.id}>{cat.nome}</option>)}
-          </select>
-          <textarea {...register('observacoes')} placeholder="Observações (opcional)" className="w-full p-2 border rounded" rows={3}></textarea>
+    // Container principal (overlay) - permanece o mesmo
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      
+      {/* ✅ MUDANÇA: O painel do modal agora usa flexbox em coluna e tem altura máxima */}
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]">
+        
+        {/* Cabeçalho Fixo */}
+        <div className="p-6 border-b">
+          <h2 className="text-2xl font-bold text-center">
+            {tipo === 'entrada' ? 'Nova Receita' : 'Nova Despesa'}
+          </h2>
+        </div>
+
+        {/* Formulário com a área de conteúdo rolável */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-hidden">
           
-          <div className="flex justify-end gap-4 pt-4">
-            <button type="button" onClick={onClose} className="px-6 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancelar</button>
-            <button type="submit" className={`px-6 py-2 text-white rounded ${tipo === 'entrada' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}>
-              Salvar
+          {/* ✅ MUDANÇA: Área dos inputs agora tem rolagem */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <input {...register('descricao', { required: true })} placeholder="Descrição" className="w-full p-2 border rounded" />
+            <input {...register('valor', { required: true, valueAsNumber: true })} type="number" step="0.01" placeholder="Valor (R$)" className="w-full p-2 border rounded" />
+            <input {...register('data_transacao', { required: true })} type="date" className="w-full p-2 border rounded" />
+            <select {...register('categoria_id', { required: true })} className="w-full p-2 border rounded bg-white">
+              <option value="">Selecione a Categoria</option>
+              {categorias.map(cat => <option key={cat.id} value={cat.id}>{cat.nome}</option>)}
+            </select>
+            <textarea {...register('observacoes')} placeholder="Observações (opcional)" className="w-full p-2 border rounded" rows={3}></textarea>
+          </div>
+          
+          {/* ✅ MUDANÇA: Rodapé com botões fica sempre visível */}
+          <div className="flex justify-end gap-4 p-6 border-t bg-gray-50">
+            <button type="button" onClick={onClose} className="px-6 py-2 bg-gray-200 rounded hover:bg-gray-300">
+              Cancelar
+            </button>
+            <button type="submit" disabled={isSubmitting} className={`px-6 py-2 text-white rounded ${tipo === 'entrada' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} disabled:bg-gray-400`}>
+              {isSubmitting ? 'Salvando...' : 'Salvar'}
             </button>
           </div>
         </form>
+
       </div>
     </div>
   );
