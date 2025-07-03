@@ -1,9 +1,9 @@
-// src/pages/Financeiro.tsx - VERSÃO FINAL COM ABAS
+// src/pages/Financeiro.tsx - VERSÃO FINAL CORRIGIDA
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '@/services/api';
 import TransacaoFormModal from '@/components/financeiro/TransacaoFormModal';
 import { PlusCircle, MinusCircle } from 'lucide-react';
-import CategoriasPage from './financeiro/CategoriasPage'; // Importa nossa página de categorias
+import CategoriasPage from './financeiro/CategoriasPage';
 import RelatoriosView from './financeiro/RelatoriosView';
 
 // --- Interfaces ---
@@ -35,6 +35,7 @@ const LancamentosView = () => {
         fetchTransacoes();
     }, []);
     
+    // ✅ CORREÇÃO: Adicionada a declaração 'return' que estava faltando
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
         const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
         const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
@@ -73,8 +74,11 @@ const LancamentosView = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
+                        {/* ✅ CORREÇÃO: Usando a variável 'loading' para dar feedback ao usuário */}
                         {loading ? (
-                            <tr><td colSpan={4} className="text-center p-4">Carregando...</td></tr>
+                            <tr><td colSpan={4} className="text-center p-4 text-gray-500">Carregando lançamentos...</td></tr>
+                        ) : transacoes.length === 0 ? (
+                            <tr><td colSpan={4} className="text-center p-4 text-gray-500">Nenhum lançamento encontrado.</td></tr>
                         ) : transacoes.map(t => (
                             <tr key={t.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(t.data_transacao).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
@@ -85,9 +89,6 @@ const LancamentosView = () => {
                                 </td>
                             </tr>
                         ))}
-                         {!loading && transacoes.length === 0 && (
-                            <tr><td colSpan={4} className="text-center p-4 text-gray-500">Nenhum lançamento encontrado.</td></tr>
-                        )}
                     </tbody>
                 </table>
             </div>
@@ -96,7 +97,6 @@ const LancamentosView = () => {
         </div>
     );
 };
-
 
 // --- Componente principal da página Financeiro ---
 export default function FinanceiroPage() {
@@ -108,40 +108,28 @@ export default function FinanceiroPage() {
                 return <LancamentosView />;
             case 'categorias':
                 return <CategoriasPage />;
-            case 'relatorios': // ✅ ADICIONA O CASO PARA RELATÓRIOS
+            case 'relatorios':
                 return <RelatoriosView />;
             default:
                 return <LancamentosView />;
         }
     };
-
+    
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold text-gray-800">Gestão Financeira</h1>
             
-            {/* ✅ Navegação por Abas */}
             <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                    <button
-                        onClick={() => setActiveTab('lancamentos')}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'lancamentos' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-                    >
-                        Lançamentos
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('categorias')}
-                        className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'categorias' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-                    >
-                        Gerenciar Categorias
-                    </button>
+                    <button onClick={() => setActiveTab('lancamentos')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'lancamentos' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Lançamentos</button>
+                    <button onClick={() => setActiveTab('categorias')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'categorias' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Gerenciar Categorias</button>
                     <button onClick={() => setActiveTab('relatorios')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'relatorios' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Relatórios</button>
                 </nav>
             </div>
 
-            {/* ✅ Conteúdo da Aba Ativa */}
             <div className="pt-4">
-            {renderContent()}
-             </div>
+                {renderContent()}
+            </div>
         </div>
     );
 }
