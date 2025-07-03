@@ -1,7 +1,8 @@
 // src/pages/Financeiro.tsx - VERSÃO FINAL CORRIGIDA
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react'; // ✅ Importa Fragment e ChangeEvent
+import { Dialog, Transition } from '@headlessui/react'; // ✅ Importa do Headless UI
 import { api } from '@/services/api';
-import TransacaoFormModal from '@/components/financeiro/TransacaoFormModal'; // ✅ Importa o modal
+import TransacaoForm from '@/components/financeiro/TransacaoForm'; // ✅ Importa o formulário correto
 import { PlusCircle, MinusCircle } from 'lucide-react';
 import CategoriasPage from './financeiro/CategoriasPage';
 import RelatoriosView from './financeiro/RelatoriosView';
@@ -20,20 +21,18 @@ interface Transacao {
 const LancamentosView = () => {
     const [transacoes, setTransacoes] = useState<Transacao[]>([]);
     const [loading, setLoading] = useState(true);
-    
-    // ✅ O estado agora controla a visibilidade do MODAL
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState<'entrada' | 'saida'>('entrada');
 
     const fetchTransacoes = () => {
-            setLoading(true);
-            api.get('/api/transacoes-financeiras')
-                .then(res => setTransacoes(res.data))
-                .catch(err => console.error("Erro ao buscar transações:", err))
-                .finally(() => setLoading(false));
+        setLoading(true);
+        api.get('/api/transacoes-financeiras')
+            .then(res => setTransacoes(res.data))
+            .catch(err => console.error("Erro ao buscar transações:", err))
+            .finally(() => setLoading(false));
     };
 
-   useEffect(() => { fetchTransacoes(); }, []);
+    useEffect(() => { fetchTransacoes(); }, []);
     
     // ✅ CORREÇÃO: Adicionada a declaração 'return' que estava faltando
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
@@ -46,17 +45,25 @@ const LancamentosView = () => {
         setModalType(tipo);
         setIsModalOpen(true);
     };
+    
+    const handleCloseModal = () => setIsModalOpen(false);
+
+    const handleSave = () => {
+        fetchTransacoes();
+        handleCloseModal();
+    };
+
 
     return (
         <div className="space-y-6">
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-green-100 p-6 rounded-lg shadow"><h3 className="text-lg font-semibold text-green-800">Receitas</h3><p className="text-3xl font-bold text-green-700">{totalEntradas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
                 <div className="bg-red-100 p-6 rounded-lg shadow"><h3 className="text-lg font-semibold text-red-800">Despesas</h3><p className="text-3xl font-bold text-red-700">{totalSaidas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
                 <div className="bg-blue-100 p-6 rounded-lg shadow"><h3 className="text-lg font-semibold text-blue-800">Saldo</h3><p className="text-3xl font-bold text-blue-700">{saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p></div>
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
-                <div>{/* Espaço para futuros filtros */}</div>
+                <h2 className="text-xl font-semibold">Últimos Lançamentos</h2>
                 <div className="flex gap-4">
                     <button onClick={() => handleOpenModal('entrada')} className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"><PlusCircle size={20} /> Nova Receita</button>
                     <button onClick={() => handleOpenModal('saida')} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"><MinusCircle size={20} /> Nova Despesa</button>
@@ -74,11 +81,11 @@ const LancamentosView = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {/* ✅ CORREÇÃO: Usando a variável 'loading' para dar feedback ao usuário */}
+                        {/* ✅ CORREÇÃO: Usando a variável 'loading' para dar feedback */}
                         {loading ? (
-                            <tr><td colSpan={4} className="text-center p-4 text-gray-500">Carregando lançamentos...</td></tr>
+                            <tr><td colSpan={4} className="text-center p-4 text-gray-500">Carregando...</td></tr>
                         ) : transacoes.length === 0 ? (
-                            <tr><td colSpan={4} className="text-center p-4 text-gray-500">Nenhum lançamento encontrado.</td></tr>
+                             <tr><td colSpan={4} className="text-center p-4 text-gray-500">Nenhum lançamento encontrado.</td></tr>
                         ) : transacoes.map(t => (
                             <tr key={t.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(t.data_transacao).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</td>
@@ -93,15 +100,26 @@ const LancamentosView = () => {
                 </table>
             </div>
 
-            <TransacaoFormModal 
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={fetchTransacoes}
-                tipo={modalType}
-            />
+            <Transition appear show={isModalOpen} as={Fragment}>
+                <Dialog as="div" className="relative z-50" onClose={handleCloseModal}>
+                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
+                        <div className="fixed inset-0 bg-black bg-opacity-30" />
+                    </Transition.Child>
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
+                                <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                    <TransacaoForm tipo={modalType} onSave={handleSave} onCancel={handleCloseModal} />
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
         </div>
     );
 };
+
 
 // --- Componente principal da página Financeiro ---
 export default function FinanceiroPage() {
@@ -123,7 +141,6 @@ export default function FinanceiroPage() {
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold text-gray-800">Gestão Financeira</h1>
-            
             <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     <button onClick={() => setActiveTab('lancamentos')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'lancamentos' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Lançamentos</button>
@@ -131,10 +148,7 @@ export default function FinanceiroPage() {
                     <button onClick={() => setActiveTab('relatorios')} className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'relatorios' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}>Relatórios</button>
                 </nav>
             </div>
-
-            <div className="pt-4">
-                {renderContent()}
-            </div>
+            <div className="pt-4">{renderContent()}</div>
         </div>
     );
 }
