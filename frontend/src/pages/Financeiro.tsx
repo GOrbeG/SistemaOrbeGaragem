@@ -1,17 +1,17 @@
-// src/pages/Financeiro.tsx - VERSÃO FINAL CORRIGIDA
-import { useState, useEffect, useMemo, Fragment } from 'react'; // ✅ Importa Fragment e ChangeEvent
-import { Dialog, Transition } from '@headlessui/react'; // ✅ Importa do Headless UI
+// src/pages/Financeiro.tsx - VERSÃO FINAL E COMPLETA
+import { useState, useEffect, useMemo, Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 import { api } from '@/services/api';
-import TransacaoForm from '@/components/financeiro/TransacaoForm'; // ✅ Importa o formulário correto
+import TransacaoForm from '@/components/financeiro/TransacaoForm';
 import { PlusCircle, MinusCircle } from 'lucide-react';
 import CategoriasPage from './financeiro/CategoriasPage';
 import RelatoriosView from './financeiro/RelatoriosView';
 
-// --- Interfaces ---
+// --- Interface para os dados da transação ---
 interface Transacao {
     id: number;
     descricao: string;
-    valor: number;
+    valor: string; // O backend envia como string, convertemos para número depois
     tipo: 'entrada' | 'saida';
     data_transacao: string;
     categoria_nome: string;
@@ -34,7 +34,6 @@ const LancamentosView = () => {
 
     useEffect(() => { fetchTransacoes(); }, []);
     
-    // ✅ CORREÇÃO: Adicionada a declaração 'return' que estava faltando
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
         const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
         const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
@@ -49,10 +48,9 @@ const LancamentosView = () => {
     const handleCloseModal = () => setIsModalOpen(false);
 
     const handleSave = () => {
-        fetchTransacoes();
         handleCloseModal();
+        fetchTransacoes(); // Atualiza a lista após salvar
     };
-
 
     return (
         <div className="space-y-6">
@@ -81,7 +79,6 @@ const LancamentosView = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {/* ✅ CORREÇÃO: Usando a variável 'loading' para dar feedback */}
                         {loading ? (
                             <tr><td colSpan={4} className="text-center p-4 text-gray-500">Carregando...</td></tr>
                         ) : transacoes.length === 0 ? (
@@ -103,7 +100,7 @@ const LancamentosView = () => {
             <Transition appear show={isModalOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-50" onClose={handleCloseModal}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0 bg-black bg-opacity-30" />
+                        <div className="fixed inset-0 bg-black/30" />
                     </Transition.Child>
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4 text-center">
