@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Outlet, } from 'react-router-dom';
 import PrivateRoute from '../components/PrivateRoute';
 import AppLayout from '../components/layout/AppLayout';
+import LancamentoFormPage from '@/pages/financeiro/LancamentoFormPage';
 
 // Importe suas páginas
 import SplashScreen from '../pages/SplashScreen';
@@ -58,7 +59,6 @@ const AppContent = () => {
           <Route path="agendamentos" element={<Agendamentos />} />
           <Route path="clientes/:id" element={<ClienteDetailPage />} />
           <Route path="os" element={<OrdensServico />} />
-          {/* ✅ ROTAS ADICIONADAS */}
           <Route path="os/novo" element={<OSFormPage />} />
           <Route path="os/editar/:id" element={<OSFormPage />} />
           <Route path="os/:id" element={<OSDetailPage />} />
@@ -69,6 +69,7 @@ const AppContent = () => {
           <Route path="clientes" element={<ClientesPage />} />
           <Route path="clientes/novo" element={<ClienteFormPage />} />
           <Route path="clientes/editar/:id"element={<ClienteFormPage />} />
+          <Route path="financeiro/lancamento/novo" element={<LancamentoFormPage />} />
         </Route>
       </Routes>
   );

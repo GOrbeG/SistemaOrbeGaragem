@@ -1,4 +1,4 @@
-// src/pages/Financeiro.tsx - VERSÃO FINAL E COMPLETA
+// src/pages/Financeiro.tsx - VERSÃO FINAL E CORRIGIDA
 import { useState, useEffect, useMemo, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { api } from '@/services/api';
@@ -7,11 +7,11 @@ import { PlusCircle, MinusCircle } from 'lucide-react';
 import CategoriasPage from './financeiro/CategoriasPage';
 import RelatoriosView from './financeiro/RelatoriosView';
 
-// --- Interface ---
+// --- Interfaces ---
 interface Transacao {
     id: number;
     descricao: string;
-    valor: string;
+    valor: string; // O backend envia como string
     tipo: 'entrada' | 'saida';
     data_transacao: string;
     categoria_nome: string;
@@ -19,6 +19,7 @@ interface Transacao {
 
 // --- Sub-componente para a visão de Lançamentos ---
 const LancamentosView = () => {
+    // ✅ CORREÇÃO 1: Usando a interface Transacao[] em vez de any[]
     const [transacoes, setTransacoes] = useState<Transacao[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,8 +36,8 @@ const LancamentosView = () => {
     useEffect(() => { fetchTransacoes(); }, []);
     
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
-        const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
-        const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
+        const entradas = transacoes.reduce((acc, t) => t.tipo === 'entrada' ? acc + Number(t.valor) : acc, 0);
+        const saidas = transacoes.reduce((acc, t) => t.tipo === 'saida' ? acc + Number(t.valor) : acc, 0);
         return { totalEntradas: entradas, totalSaidas: saidas, saldo: entradas - saidas };
     }, [transacoes]);
 
@@ -79,6 +80,7 @@ const LancamentosView = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
+                        {/* ✅ CORREÇÃO 2: Usando a variável 'loading' para dar feedback ao usuário */}
                         {loading ? (
                             <tr><td colSpan={4} className="text-center p-4 text-gray-500">Carregando...</td></tr>
                         ) : transacoes.length === 0 ? (
@@ -116,7 +118,6 @@ const LancamentosView = () => {
         </div>
     );
 };
-
 
 // --- Componente principal da página Financeiro ---
 export default function FinanceiroPage() {
