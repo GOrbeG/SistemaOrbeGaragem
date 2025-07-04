@@ -7,11 +7,11 @@ import { PlusCircle, MinusCircle } from 'lucide-react';
 import CategoriasPage from './financeiro/CategoriasPage';
 import RelatoriosView from './financeiro/RelatoriosView';
 
-// --- Interface para os dados da transação ---
+// --- Interface ---
 interface Transacao {
     id: number;
     descricao: string;
-    valor: string; // O backend envia como string, convertemos para número depois
+    valor: string;
     tipo: 'entrada' | 'saida';
     data_transacao: string;
     categoria_nome: string;
@@ -34,6 +34,7 @@ const LancamentosView = () => {
 
     useEffect(() => { fetchTransacoes(); }, []);
     
+    // ✅ CORREÇÃO APLICADA AQUI
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
         const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
         const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
@@ -49,7 +50,7 @@ const LancamentosView = () => {
 
     const handleSave = () => {
         handleCloseModal();
-        fetchTransacoes(); // Atualiza a lista após salvar
+        fetchTransacoes();
     };
 
     return (
@@ -108,7 +109,6 @@ const LancamentosView = () => {
                                 <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
                                     <TransacaoForm tipo={modalType} onSave={handleSave} onCancel={handleCloseModal} />
                                 </Dialog.Panel>
-                                
                             </Transition.Child>
                         </div>
                     </div>
