@@ -34,7 +34,6 @@ const LancamentosView = () => {
 
     useEffect(() => { fetchTransacoes(); }, []);
     
-    // ✅ CORREÇÃO APLICADA AQUI
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
         const entradas = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
         const saidas = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
