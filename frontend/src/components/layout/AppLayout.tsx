@@ -1,4 +1,4 @@
-// src/components/layout/AppLayout.tsx - VERSÃO FINAL
+// src/components/layout/AppLayout.tsx - VERSÃO SIMPLIFICADA
 import React from 'react';
 import Header from '../Header';
 import Sidebar from '../Sidebar';
@@ -9,16 +9,16 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    // Este container ocupa a tela inteira e organiza a sidebar e o conteúdo
-    <div className="flex h-screen bg-gray-100">
+    // ✅ MUDANÇA: Usa 'min-h-screen' para garantir altura mínima, mas permite crescer.
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       
-      {/* Este container garante que o conteúdo não transborde e controla a rolagem interna */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* ✅ MUDANÇA: 'overflow-hidden' removido para não travar a rolagem. */}
+      <div className="flex-1 flex flex-col">
         <Header />
         
-        {/* A área de 'main' é a única parte que terá rolagem, se necessário */}
-        <main className="flex-1 overflow-y-auto p-6">
+        {/* ✅ MUDANÇA: 'overflow-y-auto' removido. A rolagem agora será da página inteira. */}
+        <main className="flex-1 p-6">
           {children}
         </main>
       </div>
