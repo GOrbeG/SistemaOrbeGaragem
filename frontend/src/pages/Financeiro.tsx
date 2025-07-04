@@ -1,17 +1,16 @@
-// src/pages/Financeiro.tsx - VERSÃO FINAL E CORRIGIDA
-import { useState, useEffect, useMemo, Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+// src/pages/Financeiro.tsx - VERSÃO FINAL COM NAVEGAÇÃO
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ Importa o useNavigate
 import { api } from '@/services/api';
-import TransacaoForm from '@/components/financeiro/TransacaoForm';
 import { PlusCircle, MinusCircle } from 'lucide-react';
 import CategoriasPage from './financeiro/CategoriasPage';
 import RelatoriosView from './financeiro/RelatoriosView';
 
-// --- Interfaces ---
+// --- Interface da Transacao ---
 interface Transacao {
     id: number;
     descricao: string;
-    valor: string; // O backend envia como string
+    valor: string;
     tipo: 'entrada' | 'saida';
     data_transacao: string;
     categoria_nome: string;
@@ -19,39 +18,23 @@ interface Transacao {
 
 // --- Sub-componente para a visão de Lançamentos ---
 const LancamentosView = () => {
-    // ✅ CORREÇÃO 1: Usando a interface Transacao[] em vez de any[]
     const [transacoes, setTransacoes] = useState<Transacao[]>([]);
     const [loading, setLoading] = useState(true);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalType, setModalType] = useState<'entrada' | 'saida'>('entrada');
+    const navigate = useNavigate(); // ✅ Hook para navegação
 
-    const fetchTransacoes = () => {
+    useEffect(() => {
         setLoading(true);
         api.get('/api/transacoes-financeiras')
             .then(res => setTransacoes(res.data))
             .catch(err => console.error("Erro ao buscar transações:", err))
             .finally(() => setLoading(false));
-    };
-
-    useEffect(() => { fetchTransacoes(); }, []);
+    }, []);
     
     const { totalEntradas, totalSaidas, saldo } = useMemo(() => {
         const entradas = transacoes.reduce((acc, t) => t.tipo === 'entrada' ? acc + Number(t.valor) : acc, 0);
         const saidas = transacoes.reduce((acc, t) => t.tipo === 'saida' ? acc + Number(t.valor) : acc, 0);
         return { totalEntradas: entradas, totalSaidas: saidas, saldo: entradas - saidas };
     }, [transacoes]);
-
-    const handleOpenModal = (tipo: 'entrada' | 'saida') => {
-        setModalType(tipo);
-        setIsModalOpen(true);
-    };
-    
-    const handleCloseModal = () => setIsModalOpen(false);
-
-    const handleSave = () => {
-        handleCloseModal();
-        fetchTransacoes();
-    };
 
     return (
         <div className="space-y-6">
@@ -64,8 +47,9 @@ const LancamentosView = () => {
             <div className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Últimos Lançamentos</h2>
                 <div className="flex gap-4">
-                    <button onClick={() => handleOpenModal('entrada')} className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"><PlusCircle size={20} /> Nova Receita</button>
-                    <button onClick={() => handleOpenModal('saida')} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"><MinusCircle size={20} /> Nova Despesa</button>
+                    {/* ✅ BOTÕES AGORA NAVEGAM PARA A NOVA PÁGINA */}
+                    <button onClick={() => navigate('/financeiro/lancamento/novo?tipo=entrada')} className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"><PlusCircle size={20} /> Nova Receita</button>
+                    <button onClick={() => navigate('/financeiro/lancamento/novo?tipo=saida')} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold"><MinusCircle size={20} /> Nova Despesa</button>
                 </div>
             </div>
             
@@ -80,7 +64,6 @@ const LancamentosView = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {/* ✅ CORREÇÃO 2: Usando a variável 'loading' para dar feedback ao usuário */}
                         {loading ? (
                             <tr><td colSpan={4} className="text-center p-4 text-gray-500">Carregando...</td></tr>
                         ) : transacoes.length === 0 ? (
@@ -98,23 +81,6 @@ const LancamentosView = () => {
                     </tbody>
                 </table>
             </div>
-
-            <Transition appear show={isModalOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={handleCloseModal}>
-                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0 bg-black/30" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center p-4 text-center">
-                            <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-                                <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
-                                    <TransacaoForm tipo={modalType} onSave={handleSave} onCancel={handleCloseModal} />
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
         </div>
     );
 };
@@ -125,14 +91,10 @@ export default function FinanceiroPage() {
 
     const renderContent = () => {
         switch(activeTab) {
-            case 'lancamentos':
-                return <LancamentosView />;
-            case 'categorias':
-                return <CategoriasPage />;
-            case 'relatorios':
-                return <RelatoriosView />;
-            default:
-                return <LancamentosView />;
+            case 'lancamentos': return <LancamentosView />;
+            case 'categorias': return <CategoriasPage />;
+            case 'relatorios': return <RelatoriosView />;
+            default: return <LancamentosView />;
         }
     };
     
