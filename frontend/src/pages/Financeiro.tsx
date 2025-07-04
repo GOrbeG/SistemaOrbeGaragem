@@ -108,6 +108,7 @@ const LancamentosView = () => {
                                 <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
                                     <TransacaoForm tipo={modalType} onSave={handleSave} onCancel={handleCloseModal} />
                                 </Dialog.Panel>
+                                
                             </Transition.Child>
                         </div>
                     </div>
