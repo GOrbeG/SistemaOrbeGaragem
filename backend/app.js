@@ -23,6 +23,7 @@ app.use(morgan('dev'));
 // --- ROTAS PÚBLICAS ---
 // Apenas login e o registro de novos CLIENTES ficam aqui.
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/setup', require('./routes/setupRoutes.js'));
 
 
 // --- PROTEÇÃO GLOBAL ---
