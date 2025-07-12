@@ -27,7 +27,7 @@ router.get('/:id', checkPermissao(['administrador', 'funcionario']), async (req,
 
 // Criar novo usuário (admin ou funcionário)
 router.post('/novo',
-  /*checkPermissao(['administrador']),*/
+  checkPermissao(['administrador']),
   upload.single('foto'),
   [
     body('nome').notEmpty().withMessage('Nome é obrigatório'),
