@@ -1,8 +1,8 @@
 // src/pages/admin/CadastrarFuncionario.tsx
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import axios from 'axios';
-import { getToken } from '@/services/authService'; // Precisamos do token do admin
+import { api } from '@/services/api';
+ // Precisamos do token do admin
 
 // Interface para os dados do formulário do funcionário
 interface FuncionarioFormData {
@@ -47,20 +47,12 @@ export default function CadastrarFuncionario() {
     }
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL;
-      const token = getToken(); // Pega o token do admin logado
-
-      await axios.post(`${API_URL}/api/usuarios/novo`, formData, {
-        headers: { 
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}` // Envia o token para autorização
-        },
+      // ✅ A CHAMADA AGORA USA 'api.post'. O token é adicionado automaticamente.
+      await api.post('/api/usuarios/novo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       setSucesso('Funcionário cadastrado com sucesso!');
-      // Opcional: Redirecionar após um tempo
-      // setTimeout(() => navigate('/admin/gerenciar-funcionarios'), 2000);
-
     } catch (error: any) {
       setErro(error.response?.data?.error || 'Erro desconhecido ao cadastrar.');
     }

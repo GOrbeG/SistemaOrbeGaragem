@@ -45,9 +45,9 @@ export const login = async (
 /**
  * Realiza o cadastro de um novo cliente
  */
-export const cadastrar = async (formData: FormData) => {
-  // ✅ MUDANÇA 3: Usa a instância 'api' para consistência
-  const response = await api.post('/api/auth/register', formData, {
+export const cadastrar = async (formData: any) => { // Usando any para aceitar FormData
+  // ✅ Usa a instância 'api' para consistência, chamando a nova rota correta
+  const response = await api.post('/api/auth/register-client', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     }
