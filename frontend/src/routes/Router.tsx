@@ -9,6 +9,7 @@ import LancamentoFormPage from '@/pages/financeiro/LancamentoFormPage';
 import SplashScreen from '../pages/SplashScreen';
 import Login from '../pages/Login';
 import Cadastro from '../pages/Cadastro';
+import SetupAdminPage from '@/pages/SetupAdminPage';
 import Dashboard from '../pages/Dashboard';
 import Financeiro from '../pages/Financeiro';
 import Agendamentos from '../pages/Agendamentos';
@@ -52,6 +53,7 @@ const AppContent = () => {
         <Route path="/" element={<SplashScreen />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
+        <Route path="/setup-admin" element={<SetupAdminPage />} />
 
         <Route element={<ProtectedLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
