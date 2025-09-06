@@ -11,7 +11,7 @@ router.get('/', verificarJWT(['administrador', 'funcionario']), async (req, res)
   const valores = [];
 
   if (inicio && fim) {
-    filtros.push('data_criacao BETWEEN $1 AND $2');
+    filtros.push('data_entrada BETWEEN $1 AND $2');
     valores.push(inicio, fim);
   }
 
@@ -42,11 +42,11 @@ router.get('/', verificarJWT(['administrador', 'funcionario']), async (req, res)
         SELECT COALESCE(SUM(it.valor), 0) AS receita 
         FROM itens_ordem_servico it
         JOIN ordens_servico os ON os.id = it.ordem_servico_id
-        ${where.replace('data_criacao', 'os.data_criacao')}
+        ${where.replace('data_entrada', 'os.data_entrada')}
       `, valores),
       
       db.query(`
-        SELECT TO_CHAR(data_criacao, 'YYYY-MM') AS mes, COUNT(*) AS total
+        SELECT TO_CHAR(data_entrada, 'YYYY-MM') AS mes, COUNT(*) AS total
         FROM ordens_servico ${where}
         GROUP BY mes ORDER BY mes DESC LIMIT 6
       `, valores),
@@ -56,7 +56,7 @@ router.get('/', verificarJWT(['administrador', 'funcionario']), async (req, res)
         SELECT u.nome, COUNT(o.id) AS total
         FROM ordens_servico o
         JOIN usuarios u ON o.tecnico_id = u.id
-        ${where.replace('data_criacao', 'o.data_criacao')}
+        ${where.replace('data_entrada', 'o.data_entrada')}
         GROUP BY u.nome ORDER BY total DESC LIMIT 5
       `, valores),
       
