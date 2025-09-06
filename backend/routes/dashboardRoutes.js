@@ -39,7 +39,7 @@ router.get('/', verificarJWT(['administrador', 'funcionario']), async (req, res)
       
       // ✅ CORREÇÃO 1: Usando a coluna correta 'ordem_servico_id'
       db.query(`
-        SELECT COALESCE(SUM(it.valor), 0) AS receita 
+        SELECT COALESCE(SUM(it.subtotal), 0) AS receita 
         FROM itens_ordem_servico it
         JOIN ordens_servico os ON os.id = it.ordem_servico_id
         ${where.replace('data_entrada', 'os.data_entrada')}
