@@ -15,12 +15,12 @@ const { confirmacaoAgendamento } = require('../utils/emailTemplates');
 router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
     const { clienteId } = req.query; // Pega o clienteId da URL
     try {
-      let query = 'SELECT * FROM ordens_servico ORDER BY data_criacao DESC';
+      let query = 'SELECT * FROM ordens_servico ORDER BY data_entrada DESC';
       const params = [];
 
       // Se um clienteId for fornecido, modifica a query para filtrar
       if (clienteId) {
-        query = 'SELECT * FROM ordens_servico WHERE cliente_id = $1 ORDER BY data_criacao DESC';
+        query = 'SELECT * FROM ordens_servico WHERE cliente_id = $1 ORDER BY data_entrada DESC';
         params.push(clienteId);
       }
 
@@ -341,7 +341,7 @@ router.get('/visualizar/:token', async (req, res) => {
       [decoded.os_id]
     );
     const itensResult = await db.query(
-      'SELECT * FROM itens_ordem WHERE ordem_id = $1',
+      'SELECT * FROM itens_ordem_servico WHERE ordem_id = $1',
       [decoded.os_id]
     );
 
@@ -375,7 +375,7 @@ router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), as
     const osResult = await db.query(osQuery, [id]);
 
     // Query para os itens da OS
-    const itensResult = await db.query('SELECT * FROM itens_ordem WHERE ordem_id = $1', [id]);
+    const itensResult = await db.query('SELECT * FROM itens_ordem_servico WHERE ordem_id = $1', [id]);
 
     if (osResult.rows.length === 0) {
       return res.status(404).json({ error: 'OS não encontrada' });
@@ -398,7 +398,7 @@ router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), as
 
     // Informações da OS
     doc.fontSize(12).font('Helvetica-Bold').text(`OS #${os.id}`, { continued: true });
-    doc.font('Helvetica').text(` - ${new Date(os.data_criacao).toLocaleDateString('pt-BR')}`, { align: 'right' });
+    doc.font('Helvetica').text(` - ${new Date(os.data_entrada).toLocaleDateString('pt-BR')}`, { align: 'right' });
     doc.fontSize(10).fillColor('gray').text(`Status: ${os.status}`);
     doc.moveDown();
 
