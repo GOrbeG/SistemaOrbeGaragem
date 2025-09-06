@@ -11,7 +11,7 @@ router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, re
   const { data_inicio, data_fim, tipo, categoria_id } = req.query;
   try {
     let query = `
-      SELECT t.*, c.nome AS categoria_nome 
+      SELECT t.*, c.nome_categoria AS categoria_nome 
       FROM transacoes_financeiras t
       LEFT JOIN categorias_financeiras c ON t.categoria_id = c.id
     `;
