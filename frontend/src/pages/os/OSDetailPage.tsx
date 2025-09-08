@@ -10,7 +10,7 @@ import { Cliente, Veiculo, Usuario } from '@/types';
 interface OSDetails {
   id: number;
   status: string;
-  descricao: string;
+  descricao_problema: string;
   data_entrada: string; // Corrigido de data_criacao
   valor_total: number;
   cliente_id: number;
@@ -154,7 +154,7 @@ export default function OSDetailPage() {
                 <h3 className="text-lg font-semibold border-b pb-2 mb-4">Informações Gerais</h3>
                 <p><strong className="text-gray-600">Status:</strong> {os.status}</p>
                 <p><strong className="text-gray-600">Técnico:</strong> {tecnico?.nome || 'N/A'}</p>
-                <p><strong className="text-gray-600">Descrição:</strong> {os.descricao}</p>
+                <p><strong className="text-gray-600">Descrição:</strong> {os.descricao_problema}</p>
             </div>
             
             {/* ✅ SEÇÃO DE ITENS COM O FORMULÁRIO */}

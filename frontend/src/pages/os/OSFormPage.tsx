@@ -10,7 +10,7 @@ const defaultInitialState: OSFormData = {
   veiculo_id: '',
   tecnico_id: '',
   status: 'Aberta',
-  descricao: '',
+  descricao_problema: '',
   valor_total: 0,
   data_agendada: '',
 };

@@ -8,7 +8,7 @@ export interface OSFormData {
   veiculo_id: string | number;
   tecnico_id: string | number;
   status: string;
-  descricao: string;
+  descricao_problema: string;
   valor_total: number;
   data_agendada?: string | null;
 }
@@ -92,8 +92,8 @@ export default function OSForm({ formData, handleChange, clientes, veiculos, usu
           <input type="number" step="0.01" name="valor_total" id="valor_total" value={formData.valor_total} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md shadow-sm" />
         </div>
         <div className="md:col-span-2">
-          <label htmlFor="descricao" className="block text-sm font-medium text-gray-700">Descrição do Serviço</label>
-          <textarea name="descricao" id="descricao" value={formData.descricao} onChange={handleChange} required rows={4} className="mt-1 block w-full p-2 border rounded-md shadow-sm"></textarea>
+          <label htmlFor="descricao_problema" className="block text-sm font-medium text-gray-700">Descrição do Serviço</label>
+          <textarea name="descricao_problema" id="descricao_problema" value={formData.descricao_problema} onChange={handleChange} required rows={4} className="mt-1 block w-full p-2 border rounded-md shadow-sm"></textarea>
         </div>
       </div>
 
