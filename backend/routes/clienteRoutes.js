@@ -13,6 +13,8 @@ const validacaoCliente = [
   body('cpf_cnpj').notEmpty().withMessage('CPF/CNPJ é obrigatório.').isLength({ min: 11, max: 18 }),
   body('email').isEmail().withMessage('Formato de e-mail inválido.').optional({ checkFalsy: true }),
   body('telefone').notEmpty().withMessage('O telefone é obrigatório.'),
+  body('senha').if((value, { req }) => !req.params.id) // Só é obrigatório na criação (POST)
+    .isLength({ min: 6 }).withMessage('A senha deve ter no mínimo 6 caracteres.'),
   body('data_nascimento').isISO8601().toDate().withMessage('Data de nascimento inválida.').optional({ checkFalsy: true }),
   body('cep').isLength({ min: 8, max: 9 }).withMessage('CEP inválido.').optional({ checkFalsy: true }),
 ];
@@ -61,36 +63,69 @@ router.post('/', checkPermissao(['administrador', 'funcionario']), validacaoClie
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { nome, tipo_pessoa, cpf_cnpj, email, telefone, data_nascimento, cep, logradouro, numero, bairro, cidade, estado } = req.body;
+  const { nome, tipo_pessoa, cpf_cnpj, email, senha, telefone, data_nascimento, cep, logradouro, numero, bairro, cidade, estado } = req.body;
+
+  // Inicia uma conexão do pool para usar na transação
+  const client = await db.connect();
 
   try {
-    // VERIFICAÇÃO IMPORTANTE: Impede CPF/CNPJ duplicado
-    const clienteExistente = await db.query('SELECT id FROM clientes WHERE cpf_cnpj = $1', [cpf_cnpj]);
-    if (clienteExistente.rows.length > 0) {
-        return res.status(409).json({ errors: [{ msg: 'Já existe um cliente com este CPF/CNPJ.' }] });
-    }
+    // Inicia a transação
+    await client.query('BEGIN');
 
-    const query = `
+    // --- Passo 1: Criar o registro na tabela 'usuarios' ---
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const role = 'cliente';
+
+    // Insere o usuário e verifica se o e-mail ou CPF já existem na tabela de usuários
+    const queryUsuario = `
+      INSERT INTO usuarios (nome, email, senha, cpf, role)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id;
+    `;
+    // Nota: O nome da coluna no banco é 'senha', mas armazenamos o hash.
+    await client.query(queryUsuario, [nome, email, senhaHash, cpf_cnpj, role]);
+
+    // --- Passo 2: Criar o registro na tabela 'clientes' ---
+    const queryCliente = `
       INSERT INTO clientes (nome, tipo_pessoa, cpf_cnpj, email, telefone, data_nascimento, cep, logradouro, numero, bairro, cidade, estado)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *;
     `;
-    const params = [nome, tipo_pessoa, cpf_cnpj, email, telefone, data_nascimento || null, cep, logradouro, numero, bairro, cidade, estado];
-    
-    const result = await db.query(query, params);
-    
+    const paramsCliente = [nome, tipo_pessoa, cpf_cnpj, email, telefone, data_nascimento || null, cep, logradouro, numero, bairro, cidade, estado];
+    const resultCliente = await client.query(queryCliente, paramsCliente);
+    const novoCliente = resultCliente.rows[0];
+
+    // --- Passo 3: Registrar o histórico ---
     await registrarHistorico({
         usuario_id: req.user.id,
         acao: 'criar',
         entidade: 'clientes',
-        entidade_id: result.rows[0].id,
-        dados_novos: result.rows[0]
-      });
+        entidade_id: novoCliente.id,
+        dados_novos: novoCliente
+      }, client); // Passa o 'client' da transação para o log
 
-    res.status(201).json(result.rows[0]);
+    // Finaliza a transação com sucesso
+    await client.query('COMMIT');
+
+    res.status(201).json(novoCliente);
+
   } catch (error) {
-    console.error('Erro ao criar cliente:', error);
+    // Se qualquer passo falhar, desfaz a transação
+    await client.query('ROLLBACK');
+    console.error('Erro transacional ao criar cliente:', error);
+
+    // Trata erros de duplicidade de forma amigável
+    if (error.code === '23505') { // Código de erro do PostgreSQL para unique_violation
+        if (error.constraint.includes('usuarios')) {
+             return res.status(409).json({ errors: [{ msg: `Já existe um usuário com este ${error.constraint.includes('email') ? 'E-mail' : 'CPF'}.` }] });
+        }
+        return res.status(409).json({ errors: [{ msg: 'Já existe um cliente com este CPF/CNPJ.' }] });
+    }
+    
     res.status(500).json({ error: 'Erro interno no servidor' });
+  } finally {
+    // Libera a conexão de volta para o pool
+    client.release();
   }
 });
 
