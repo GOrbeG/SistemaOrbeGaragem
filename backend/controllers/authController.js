@@ -2,7 +2,7 @@
 
 // --- MUDANÇA 1: Importe o 'validationResult' da biblioteca express-validator ---
 const { validationResult } = require('express-validator');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
