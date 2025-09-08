@@ -3,6 +3,7 @@ const db = require('../config/db');
 const { body, validationResult } = require('express-validator');
 const checkPermissao = require('../middlewares/checkPermissao');
 const registrarHistorico = require('../middlewares/logHistorico');
+const bcrypt = require('bcrypt');
 
 const router = express.Router();
 
