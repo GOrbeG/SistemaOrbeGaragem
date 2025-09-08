@@ -8,7 +8,7 @@ import { Cliente, Veiculo, Usuario } from '@/types';
 const defaultInitialState: OSFormData = {
   cliente_id: '',
   veiculo_id: '',
-  usuario_id: '',
+  tecnico_id: '',
   status: 'Aberta',
   descricao: '',
   valor_total: 0,

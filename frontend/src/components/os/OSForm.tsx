@@ -6,7 +6,7 @@ import { Cliente, Veiculo, Usuario } from '@/types';
 export interface OSFormData {
   cliente_id: string | number;
   veiculo_id: string | number;
-  usuario_id: string | number;
+  tecnico_id: string | number;
   status: string;
   descricao: string;
   valor_total: number;
@@ -69,8 +69,8 @@ export default function OSForm({ formData, handleChange, clientes, veiculos, usu
           </select>
         </div>
          <div>
-          <label htmlFor="usuario_id" className="block text-sm font-medium text-gray-700">Técnico Responsável</label>
-          <select name="usuario_id" id="usuario_id" value={formData.usuario_id} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md shadow-sm bg-white">
+          <label htmlFor="tecnico_id" className="block text-sm font-medium text-gray-700">Técnico Responsável</label>
+          <select name="tecnico_id" id="tecnico_id" value={formData.tecnico_id} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md shadow-sm bg-white">
             <option value="">Selecione um técnico</option>
             {usuarios.map(u => <option key={u.id} value={u.id}>{u.nome}</option>)}
           </select>

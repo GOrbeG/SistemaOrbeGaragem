@@ -12,7 +12,7 @@ export interface OrdemServico {
   status: string;
   descricao: string;
   valor_total: number;
-  data_criacao: string;
+  data_entrada: string;
 }
 
 // Componente para exibir o status com cores
@@ -104,7 +104,7 @@ export default function OrdensServicoPage() {
                 <tr key={os.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{os.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm"><StatusBadge status={os.status} /></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(os.data_criacao).toLocaleDateString('pt-BR')}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(os.data_entrada).toLocaleDateString('pt-BR')}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {os.valor_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </td>

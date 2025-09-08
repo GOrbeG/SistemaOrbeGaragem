@@ -11,19 +11,25 @@ interface OSDetails {
   id: number;
   status: string;
   descricao: string;
-  data_criacao: string;
+  data_entrada: string; // Corrigido de data_criacao
   valor_total: number;
   cliente_id: number;
   veiculo_id: number;
-  usuario_id: number;
+  tecnico_id: number; // Corrigido de usuario_id
 }
 interface ItemOS {
   id: number;
   descricao: string;
-  valor: number;
+  quantidade: number;
+  preco_unitario: number;
+  subtotal: number;
 }
-type ItemFormData = Omit<ItemOS, 'id'>;
-
+// Interface para o formulário de novo item
+type ItemFormData = {
+    descricao: string;
+    quantidade: number;
+    preco_unitario: number;
+}
 
 // ✅ --- Sub-componente para o formulário de adicionar item ---
 const AddItemForm = ({ osId, onAddItem }: { osId: number, onAddItem: () => void }) => {
@@ -32,11 +38,14 @@ const AddItemForm = ({ osId, onAddItem }: { osId: number, onAddItem: () => void 
     const onSubmit: SubmitHandler<ItemFormData> = async (data) => {
         try {
             await api.post('/api/itens-ordem', {
-                ordem_id: osId,
+                ordem_servico_id: osId,
                 descricao: data.descricao,
-                valor: data.valor,
+                quantidade: data.quantidade,
+                preco_unitario: data.preco_unitario,
+                subtotal: data.quantidade * data.preco_unitario,
+                tipo_item: 'Serviço', // ou ter um seletor para 'Peça'
             });
-            reset(); // Limpa o formulário após o sucesso
+            reset();
             onAddItem(); // Avisa o componente pai para recarregar os dados
         } catch (error) {
             console.error("Erro ao adicionar item:", error);
@@ -50,9 +59,13 @@ const AddItemForm = ({ osId, onAddItem }: { osId: number, onAddItem: () => void 
                 <label htmlFor="item_descricao" className="text-sm font-medium text-gray-700">Descrição do Item/Serviço</label>
                 <input id="item_descricao" {...register('descricao', { required: true })} placeholder="Ex: Troca de óleo do motor" className="w-full mt-1 p-2 border rounded-md" />
             </div>
+             <div className="w-24">
+                <label htmlFor="item_quantidade" className="text-sm font-medium text-gray-700">Qtd.</label>
+                <input id="item_quantidade" {...register('quantidade', { required: true, valueAsNumber: true, min: 1 })} type="number" defaultValue={1} className="w-full mt-1 p-2 border rounded-md" />
+            </div>
             <div className="w-40">
-                <label htmlFor="item_valor" className="text-sm font-medium text-gray-700">Valor (R$)</label>
-                <input id="item_valor" {...register('valor', { required: true, valueAsNumber: true })} type="number" step="0.01" placeholder="150.00" className="w-full mt-1 p-2 border rounded-md" />
+                <label htmlFor="item_preco_unitario" className="text-sm font-medium text-gray-700">Valor Unit. (R$)</label>
+                <input id="item_preco_unitario" {...register('preco_unitario', { required: true, valueAsNumber: true })} type="number" step="0.01" placeholder="150.00" className="w-full mt-1 p-2 border rounded-md" />
             </div>
             <button type="submit" disabled={isSubmitting} className="h-10 px-4 bg-green-600 hover:bg-green-700 text-white rounded-md inline-flex items-center gap-2 disabled:bg-gray-400">
                 <PlusCircle size={18} /> {isSubmitting ? 'Adicionando...' : 'Adicionar'}
@@ -83,11 +96,11 @@ export default function OSDetailPage() {
       setOs(osData);
       setItens(itensRes.data);
 
-      if (osData.cliente_id && osData.veiculo_id && osData.usuario_id) {
+      if (osData.cliente_id && osData.veiculo_id && osData.tecnico_id) {
           const [clienteRes, veiculoRes, tecnicoRes] = await Promise.all([
               api.get(`/api/clientes/${osData.cliente_id}`),
               api.get(`/api/veiculos/${osData.veiculo_id}`),
-              api.get(`/api/usuarios/${osData.usuario_id}`)
+              api.get(`/api/usuarios/${osData.tecnico_id}`)
           ]);
           setCliente(clienteRes.data);
           setVeiculo(veiculoRes.data);
@@ -159,7 +172,7 @@ export default function OSDetailPage() {
                             {itens.map(item => (
                                 <tr key={item.id} className="border-t">
                                     <td className="py-2 px-4">{item.descricao}</td>
-                                    <td className="text-right py-2 px-4">{item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                    <td className="text-right py-2 px-4">{item.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 </tr>
                             ))}
                              {itens.length === 0 && (
