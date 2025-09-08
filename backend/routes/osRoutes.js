@@ -65,7 +65,7 @@ router.post(
       .isInt()
       .withMessage('ID do usuário é obrigatório e deve ser numérico'),
     body('status').notEmpty().withMessage('Status é obrigatório'),
-    body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
+    body('descricao_problema').notEmpty().withMessage('Descrição é obrigatória'),
     body('valor_total')
       .isFloat()
       .withMessage('Valor total deve ser numérico'),
@@ -88,7 +88,7 @@ router.post(
       veiculo_id,
       tecnico_id,
       status,
-      descricao,
+      descricao_problema,
       valor_total,
       data_agendada,
     } = req.body;
@@ -98,7 +98,7 @@ router.post(
       const result = await db.query(
         `
         INSERT INTO ordens_servico
-          (cliente_id, veiculo_id, tecnico_id, status, descricao, valor_total, data_agendada)
+          (cliente_id, veiculo_id, tecnico_id, status, descricao_problema, valor_total, data_agendada)
         VALUES
           ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
@@ -108,7 +108,7 @@ router.post(
           veiculo_id,
           tecnico_id,
           status,
-          descricao,
+          descricao_problema,
           valor_total,
           data_agendada,
         ]
@@ -197,7 +197,7 @@ router.put(
       .isInt()
       .withMessage('ID do usuário é obrigatório e deve ser numérico'),
     body('status').notEmpty().withMessage('Status é obrigatório'),
-    body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
+    body('descricao_problema').notEmpty().withMessage('Descrição é obrigatória'),
     body('valor_total')
       .isFloat()
       .withMessage('Valor total deve ser numérico'),
@@ -217,7 +217,7 @@ router.put(
       veiculo_id,
       tecnico_id,
       status,
-      descricao,
+      descricao_problema,
       valor_total,
       data_agendada,
     } = req.body;
@@ -239,7 +239,7 @@ router.put(
           veiculo_id = $2,
           tecnico_id = $3,
           status = $4,
-          descricao = $5,
+          descricao_problema = $5,
           valor_total = $6,
           data_agendada = $7
         WHERE id = $8
@@ -250,7 +250,7 @@ router.put(
           veiculo_id,
           tecnico_id,
           status,
-          descricao,
+          descricao_problema,
           valor_total,
           data_agendada,
           req.params.id,
