@@ -11,6 +11,7 @@ export interface ClienteFormData {
   tipo_pessoa: 'PF' | 'PJ';
   cpf_cnpj: string;
   email: string;
+  senha?: string;
   telefone: string;
   data_nascimento: string;
   cep: string;
@@ -26,6 +27,7 @@ const initialState: ClienteFormData = {
   tipo_pessoa: 'PF',
   cpf_cnpj: '',
   email: '',
+  senha: '',
   telefone: '',
   data_nascimento: '',
   cep: '',
@@ -98,6 +100,7 @@ export default function ClienteFormPage() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         apiErrors={apiErrors}
+        isEditMode={isEditMode}
       />
     </div>
   );

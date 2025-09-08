@@ -8,9 +8,10 @@ interface ClienteFormProps {
   onSubmit: (data: ClienteFormData) => void;
   isSubmitting: boolean;
   apiErrors: any[];
+  isEditMode: boolean;
 }
 
-export default function ClienteForm({ initialData, onSubmit, isSubmitting, apiErrors }: ClienteFormProps) {
+export default function ClienteForm({ initialData, onSubmit, isSubmitting, apiErrors, isEditMode }: ClienteFormProps) {
   const [formData, setFormData] = useState<ClienteFormData>(initialData);
 
   useEffect(() => {
@@ -47,6 +48,12 @@ export default function ClienteForm({ initialData, onSubmit, isSubmitting, apiEr
             <label htmlFor="nome" className="block text-sm font-medium text-gray-700">Nome Completo</label>
             <input type="text" name="nome" id="nome" value={formData.nome} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md shadow-sm" />
           </div>
+          {!isEditMode && (
+             <div>
+              <label htmlFor="senha" className="block text-sm font-medium text-gray-700">Senha de Acesso</label>
+              <input type="password" name="senha" id="senha" value={formData.senha} onChange={handleChange} required className="mt-1 block w-full p-2 border rounded-md shadow-sm" />
+            </div>
+          )}
           <div>
             <label htmlFor="tipo_pessoa" className="block text-sm font-medium text-gray-700">Tipo</label>
             <select name="tipo_pessoa" id="tipo_pessoa" value={formData.tipo_pessoa} onChange={handleChange} className="mt-1 block w-full p-2 border rounded-md shadow-sm bg-white">
