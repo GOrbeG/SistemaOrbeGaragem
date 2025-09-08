@@ -61,7 +61,7 @@ router.post(
     body('veiculo_id')
       .isInt()
       .withMessage('ID do veículo é obrigatório e deve ser numérico'),
-    body('usuario_id')
+    body('tecnico_id')
       .isInt()
       .withMessage('ID do usuário é obrigatório e deve ser numérico'),
     body('status').notEmpty().withMessage('Status é obrigatório'),
@@ -86,7 +86,7 @@ router.post(
     const {
       cliente_id,
       veiculo_id,
-      usuario_id,
+      tecnico_id,
       status,
       descricao,
       valor_total,
@@ -98,7 +98,7 @@ router.post(
       const result = await db.query(
         `
         INSERT INTO ordens_servico
-          (cliente_id, veiculo_id, usuario_id, status, descricao, valor_total, data_agendada)
+          (cliente_id, veiculo_id, tecnico_id, status, descricao, valor_total, data_agendada)
         VALUES
           ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
@@ -106,7 +106,7 @@ router.post(
         [
           cliente_id,
           veiculo_id,
-          usuario_id,
+          tecnico_id,
           status,
           descricao,
           valor_total,
@@ -165,7 +165,7 @@ router.post(
             ($1, $2, $3)
           `,
           [
-            usuario_id,
+            tecnico_id,
             `Nova OS agendada para ${new Date(data_agendada).toLocaleDateString(
               'pt-BR'
             )}`,
@@ -193,7 +193,7 @@ router.put(
     body('veiculo_id')
       .isInt()
       .withMessage('ID do veículo é obrigatório e deve ser numérico'),
-    body('usuario_id')
+    body('tecnico_id')
       .isInt()
       .withMessage('ID do usuário é obrigatório e deve ser numérico'),
     body('status').notEmpty().withMessage('Status é obrigatório'),
@@ -215,7 +215,7 @@ router.put(
     const {
       cliente_id,
       veiculo_id,
-      usuario_id,
+      tecnico_id,
       status,
       descricao,
       valor_total,
@@ -237,7 +237,7 @@ router.put(
         SET
           cliente_id = $1,
           veiculo_id = $2,
-          usuario_id = $3,
+          tecnico_id = $3,
           status = $4,
           descricao = $5,
           valor_total = $6,
@@ -248,7 +248,7 @@ router.put(
         [
           cliente_id,
           veiculo_id,
-          usuario_id,
+          tecnico_id,
           status,
           descricao,
           valor_total,
@@ -341,7 +341,7 @@ router.get('/visualizar/:token', async (req, res) => {
       [decoded.os_id]
     );
     const itensResult = await db.query(
-      'SELECT * FROM itens_ordem_servico WHERE ordem_id = $1',
+      'SELECT * FROM itens_ordem_servico WHERE ordem_servico_id = $1',
       [decoded.os_id]
     );
 
@@ -375,7 +375,7 @@ router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), as
     const osResult = await db.query(osQuery, [id]);
 
     // Query para os itens da OS
-    const itensResult = await db.query('SELECT * FROM itens_ordem_servico WHERE ordem_id = $1', [id]);
+    const itensResult = await db.query('SELECT * FROM itens_ordem_servico WHERE ordem_servico_id = $1', [id]);
 
     if (osResult.rows.length === 0) {
       return res.status(404).json({ error: 'OS não encontrada' });
@@ -433,7 +433,7 @@ router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), as
     let currentY = doc.y + 5;
     itens.forEach(item => {
         doc.font('Helvetica').fontSize(10).text(item.descricao, itemX, currentY, { width: 380 });
-        doc.text(parseFloat(item.valor).toFixed(2), valorX, currentY, { align: 'right' });
+        doc.text(parseFloat(item.subtotal).toFixed(2), valorX, currentY, { align: 'right' });
         currentY += 20;
     });
 
