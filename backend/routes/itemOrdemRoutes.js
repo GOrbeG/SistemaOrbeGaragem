@@ -5,74 +5,72 @@ const { body, validationResult } = require('express-validator');
 const registrarHistorico = require('../middlewares/logHistorico');
 const checkPermissao = require('../middlewares/checkPermissao');
 
-// ✅ ROTA ATUALIZADA: Listar todos os itens ou filtrar por ordem_id
+// Listar todos os itens de uma OS específica
 router.get('/', async (req, res) => {
-  const { ordemId } = req.query;
+  // ✅ CORREÇÃO: Lendo o parâmetro 'ordem_servico_id' que o frontend envia
+  const { ordem_servico_id } = req.query;
+
+  // Garante que um ID foi fornecido
+  if (!ordem_servico_id) {
+    return res.status(400).json({ error: 'ID da Ordem de Serviço é obrigatório.' });
+  }
 
   try {
-    let query = 'SELECT * FROM itens_ordem';
-    const params = [];
-
-    if (ordemId) {
-      query += ' WHERE ordem_id = $1';
-      params.push(ordemId);
-    }
+    // ✅ CORREÇÃO: Usando a tabela e coluna corretas
+    const query = 'SELECT * FROM itens_ordem_servico WHERE ordem_servico_id = $1 ORDER BY id ASC';
+    const params = [ordem_servico_id];
     
     const result = await db.query(query, params);
     res.json(result.rows);
   } catch (error) {
+    console.error("Erro ao buscar itens de ordem:", error);
     res.status(500).json({ error: 'Erro ao buscar itens de ordem' });
   }
 });
 
-// buscar item por id
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await db.query('SELECT * FROM itens_ordem WHERE id = $1', [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Item não encontrado' });
-    res.json(result.rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar item' });
-  }
-});
-
-// ✅ ROTA ATUALIZADA: Criar novo item e ATUALIZAR O TOTAL DA OS
+// Criar novo item e ATUALIZAR O TOTAL DA OS
 router.post('/',
     checkPermissao(['administrador', 'funcionario']),
     [
-        body('ordem_id').isInt().withMessage('ID da ordem é obrigatório'),
+        // ✅ CORREÇÃO: Validação alinhada com o formulário e a tabela
+        body('ordem_servico_id').isInt().withMessage('ID da ordem é obrigatório'),
         body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
-        body('valor').isFloat({ gt: -1 }).withMessage('Valor deve ser numérico') // Permitindo valor 0
+        body('quantidade').isInt({ gt: 0 }).withMessage('Quantidade deve ser um número maior que zero'),
+        body('preco_unitario').isFloat({ gt: -1 }).withMessage('Preço unitário deve ser numérico'),
+        body('subtotal').isFloat().withMessage('Subtotal deve ser numérico'),
+        body('tipo_item').notEmpty().withMessage('Tipo do item é obrigatório')
     ],
     async (req, res) => {
         const erros = validationResult(req);
         if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
-        const { ordem_id, descricao, valor } = req.body;
-        const client = await db.connect(); // Inicia conexão para transação
+        const { ordem_servico_id, descricao, quantidade, preco_unitario, subtotal, tipo_item } = req.body;
+        const client = await db.connect();
 
         try {
-            await client.query('BEGIN'); // Começa a transação
+            await client.query('BEGIN');
 
-            // 1. Insere o novo item
-            const insertItemQuery = 'INSERT INTO itens_ordem (ordem_id, descricao, valor) VALUES ($1, $2, $3) RETURNING *';
-            const newItemResult = await client.query(insertItemQuery, [ordem_id, descricao, valor]);
+            // ✅ CORREÇÃO: Query de INSERT com a tabela e colunas corretas
+            const insertItemQuery = `
+                INSERT INTO itens_ordem_servico (ordem_servico_id, descricao, quantidade, preco_unitario, subtotal, tipo_item) 
+                VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+            `;
+            const newItemResult = await client.query(insertItemQuery, [ordem_servico_id, descricao, quantidade, preco_unitario, subtotal, tipo_item]);
 
-            // 2. Recalcula e atualiza o valor_total na tabela ordens_servico
+            // ✅ CORREÇÃO: Recalcula e atualiza o valor_total na OS somando os subtotais
             const updateTotalQuery = `
                 UPDATE ordens_servico
-                SET valor_total = (SELECT SUM(valor) FROM itens_ordem WHERE ordem_id = $1)
+                SET valor_total = (SELECT SUM(subtotal) FROM itens_ordem_servico WHERE ordem_servico_id = $1)
                 WHERE id = $1;
             `;
-            await client.query(updateTotalQuery, [ordem_id]);
+            await client.query(updateTotalQuery, [ordem_servico_id]);
 
-            await client.query('COMMIT'); // Confirma a transação se tudo deu certo
+            await client.query('COMMIT');
             
-            // Opcional: Registrar histórico
             await registrarHistorico({
                 usuario_id: req.user.id,
                 acao: 'criar',
-                entidade: 'itens_ordem',
+                entidade: 'itens_ordem_servico',
                 entidade_id: newItemResult.rows[0].id,
                 dados_novos: newItemResult.rows[0]
             });
@@ -80,74 +78,123 @@ router.post('/',
             res.status(201).json(newItemResult.rows[0]);
 
         } catch (error) {
-            await client.query('ROLLBACK'); // Desfaz tudo se der erro
+            await client.query('ROLLBACK');
             console.error("Erro ao criar item:", error);
             res.status(500).json({ error: 'Erro ao criar item' });
         } finally {
-            client.release(); // Libera a conexão
+            client.release();
         }
     }
 );
 
-// Atualizar item da ordem
-router.put(
-  '/:id',
+// Atualizar item da ordem e ATUALIZAR O TOTAL DA OS
+router.put('/:id',
+  checkPermissao(['administrador', 'funcionario']),
   [
-    body('ordem_id').isInt().withMessage('ID da ordem é obrigatório'),
     body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
-    body('valor').isFloat({ gt: 0 }).withMessage('Valor deve ser numérico e maior que zero')
+    body('quantidade').isInt({ gt: 0 }).withMessage('Quantidade deve ser um número maior que zero'),
+    body('preco_unitario').isFloat({ gt: -1 }).withMessage('Preço unitário deve ser numérico'),
   ],
   async (req, res) => {
     const erros = validationResult(req);
     if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
-    const { ordem_id, descricao, valor } = req.body;
+    const { id } = req.params;
+    const { descricao, quantidade, preco_unitario } = req.body;
+    const subtotal = Number(quantidade) * Number(preco_unitario);
+    const client = await db.connect();
+
     try {
-      const itemAntes = await db.query('SELECT * FROM itens_ordem WHERE id = $1', [req.params.id]);
+        await client.query('BEGIN');
 
-      const result = await db.query(
-        'UPDATE itens_ordem SET ordem_id = $1, descricao = $2, valor = $3 WHERE id = $4 RETURNING *',
-        [ordem_id, descricao, valor, req.params.id]
-      );
+        const itemAntesResult = await client.query('SELECT * FROM itens_ordem_servico WHERE id = $1', [id]);
+        if (itemAntesResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'Item não encontrado' });
+        }
+        const itemAntes = itemAntesResult.rows[0];
+        const { ordem_servico_id } = itemAntes;
 
-      if (result.rows.length === 0) return res.status(404).json({ error: 'Item não encontrado' });
+        const updateQuery = `
+            UPDATE itens_ordem_servico 
+            SET descricao = $1, quantidade = $2, preco_unitario = $3, subtotal = $4 
+            WHERE id = $5 RETURNING *
+        `;
+        const updatedItemResult = await client.query(updateQuery, [descricao, quantidade, preco_unitario, subtotal, id]);
 
-      await registrarHistorico({
-        usuario_id: req.user.id,
-        acao: 'atualizar',
-        entidade: 'itens_ordem',
-        entidade_id: req.params.id,
-        dados_anteriores: itemAntes.rows[0],
-        dados_novos: result.rows[0]
-      });
+        const updateTotalQuery = `
+            UPDATE ordens_servico
+            SET valor_total = (SELECT SUM(subtotal) FROM itens_ordem_servico WHERE ordem_servico_id = $1)
+            WHERE id = $1;
+        `;
+        await client.query(updateTotalQuery, [ordem_servico_id]);
 
-      res.json(result.rows[0]);
+        await client.query('COMMIT');
+
+        await registrarHistorico({
+            usuario_id: req.user.id,
+            acao: 'atualizar',
+            entidade: 'itens_ordem_servico',
+            entidade_id: id,
+            dados_anteriores: itemAntes,
+            dados_novos: updatedItemResult.rows[0]
+        });
+        
+        res.json(updatedItemResult.rows[0]);
+
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao atualizar item' });
+        await client.query('ROLLBACK');
+        console.error("Erro ao atualizar item:", error);
+        res.status(500).json({ error: 'Erro ao atualizar item' });
+    } finally {
+        client.release();
     }
   }
 );
 
-// Deletar item da ordem
-router.delete('/:id', async (req, res) => {
-  try {
-    const itemAntes = await db.query('SELECT * FROM itens_ordem WHERE id = $1', [req.params.id]);
+// Deletar item da ordem e ATUALIZAR O TOTAL DA OS
+router.delete('/:id', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
+    const { id } = req.params;
+    const client = await db.connect();
 
-    const result = await db.query('DELETE FROM itens_ordem WHERE id = $1 RETURNING *', [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Item não encontrado' });
+    try {
+        await client.query('BEGIN');
 
-    await registrarHistorico({
-      usuario_id: req.user.id,
-      acao: 'deletar',
-      entidade: 'itens_ordem',
-      entidade_id: req.params.id,
-      dados_anteriores: itemAntes.rows[0]
-    });
+        const itemAntesResult = await client.query('SELECT * FROM itens_ordem_servico WHERE id = $1', [id]);
+        if (itemAntesResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'Item não encontrado' });
+        }
+        const itemAntes = itemAntesResult.rows[0];
+        const { ordem_servico_id } = itemAntes;
 
-    res.json({ mensagem: 'Item deletado com sucesso' });
+        await client.query('DELETE FROM itens_ordem_servico WHERE id = $1', [id]);
+
+        const updateTotalQuery = `
+            UPDATE ordens_servico
+            SET valor_total = (SELECT COALESCE(SUM(subtotal), 0) FROM itens_ordem_servico WHERE ordem_servico_id = $1)
+            WHERE id = $1;
+        `;
+        await client.query(updateTotalQuery, [ordem_servico_id]);
+
+        await client.query('COMMIT');
+
+        await registrarHistorico({
+            usuario_id: req.user.id,
+            acao: 'deletar',
+            entidade: 'itens_ordem_servico',
+            entidade_id: id,
+            dados_anteriores: itemAntes
+        });
+
+        res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao deletar item' });
-  }
+        await client.query('ROLLBACK');
+        console.error("Erro ao deletar item:", error);
+        res.status(500).json({ error: 'Erro ao deletar item' });
+    } finally {
+        client.release();
+    }
 });
 
 module.exports = router;
