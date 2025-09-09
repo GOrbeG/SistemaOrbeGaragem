@@ -417,7 +417,7 @@ router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), as
 
     // Descrição principal da OS
     doc.font('Helvetica-Bold').text('Descrição do Problema/Serviço:');
-    doc.font('Helvetica').text(os.descricao, { align: 'justify' });
+    doc.font('Helvetica').text(os.descricao_problema, { align: 'justify' });
     doc.moveDown(2);
 
     // Tabela de Itens e Serviços
