@@ -90,7 +90,7 @@ export default function OSDetailPage() {
     if (!id) return;
     try {
       const osRes = await api.get(`/api/os/${id}`);
-      const itensRes = await api.get(`/api/itens-ordem?ordemId=${id}`);
+      const itensRes = await api.get(`/api/itens-ordem?ordem_servico_id=${id}`);
       
       const osData: OSDetails = osRes.data;
       setOs(osData);
