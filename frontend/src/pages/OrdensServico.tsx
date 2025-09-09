@@ -10,7 +10,7 @@ export interface OrdemServico {
   cliente_id: number; // No futuro, podemos popular com o nome do cliente
   veiculo_id: number; // No futuro, podemos popular com os dados do veículo
   status: string;
-  descricao: string;
+  descricao_problema: string;
   valor_total: number;
   data_entrada: string;
 }

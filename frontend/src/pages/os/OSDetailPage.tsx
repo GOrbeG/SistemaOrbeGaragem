@@ -164,30 +164,33 @@ export default function OSDetailPage() {
                     <table className="min-w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="text-left py-2 px-4">Descrição</th>
-                                <th className="text-right py-2 px-4">Valor</th>
+                                <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                                <th className="text-center py-2 px-4 text-xs font-medium text-gray-500 uppercase">Qtd</th>
+                                <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Vl. Unit.</th>
+                                <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             {itens.map(item => (
                                 <tr key={item.id} className="border-t">
-                                    <td className="py-2 px-4">{item.descricao}</td>
-                                    <td className="text-right py-2 px-4">{item.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                    <td className="py-2 px-4 text-sm">{item.descricao}</td>
+                                    <td className="text-center py-2 px-4 text-sm">{item.quantidade}</td>
+                                    <td className="text-right py-2 px-4 text-sm">{item.preco_unitario.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                    <td className="text-right py-2 px-4 text-sm font-medium">{item.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                 </tr>
                             ))}
                              {itens.length === 0 && (
-                                <tr><td colSpan={2} className="text-center text-gray-500 py-4">Nenhum item adicionado.</td></tr>
+                                <tr><td colSpan={4} className="text-center text-gray-500 py-4">Nenhum item adicionado.</td></tr>
                             )}
                         </tbody>
                         <tfoot>
                             <tr className="border-t-2 font-bold bg-gray-50">
-                                <td className="text-right py-2 px-4">Total:</td>
+                                <td colSpan={3} className="text-right py-2 px-4">Total:</td>
                                 <td className="text-right py-2 px-4">{os.valor_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-                {/* Adicionando o formulário aqui */}
                 <AddItemForm osId={os.id} onAddItem={fetchOSData} />
             </div>
         </div>
