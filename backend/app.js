@@ -9,9 +9,10 @@ const app = express();
 
 // --- Middlewares Globais ---
 const corsOptions = {
-  // A URL exata do seu frontend no Render
-  origin: 'https://sistemaorbegaragem-1.onrender.com', 
-  optionsSuccessStatus: 200
+  origin: 'https://sistemaorbegaragem-1.onrender.com', // A URL exata do seu frontend
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Permite todos os métodos HTTP comuns
+  preflightContinue: false,
+  optionsSuccessStatus: 204 // Padrão para requisições de verificação (preflight)
 };
 app.use(cors(corsOptions)); // Agora a configuração global está correta
 
