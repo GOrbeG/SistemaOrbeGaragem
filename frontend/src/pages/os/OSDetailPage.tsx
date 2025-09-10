@@ -43,7 +43,7 @@ const AddItemForm = ({ osId, onAddItem }: { osId: number, onAddItem: () => void 
                 quantidade: data.quantidade,
                 preco_unitario: data.preco_unitario,
                 subtotal: data.quantidade * data.preco_unitario,
-                tipo_item: 'Serviço', // ou ter um seletor para 'Peça'
+                tipo_item: 'serviço', // ou ter um seletor para 'Peça'
             });
             reset();
             onAddItem(); // Avisa o componente pai para recarregar os dados
