@@ -55,7 +55,7 @@ app.use('/api/itens-ordem', require('./routes/itemOrdemRoutes'));
 app.use('/api/agenda', require('./routes/agendaRoutes'));
 app.use('/api/categorias-financeiras', require('./routes/categoriasRoutes'));
 app.use('/api/transacoes-financeiras', require('./routes/transacoesRoutes'));
-
+app.use('/api/atualizacoes-os', require('./routes/atualizacoesOSRoutes'));
 
 // Rota raiz apenas para checagem de status
 app.get('/', (req, res) => {
