@@ -44,7 +44,20 @@ router.post('/',
         const erros = validationResult(req);
         if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
-        const { ordem_servico_id, descricao, quantidade, preco_unitario, subtotal, tipo_item } = req.body;
+        const { ordem_servico_id, descricao, quantidade, preco_unitario, subtotal } = req.body;
+        let tipo_item = req.body.tipo_item; // Pega o tipo_item separadamente
+
+        // ✅ CORREÇÃO DEFINITIVA: Força o valor a ser minúsculo antes de salvar.
+        // Isso resolve qualquer inconsistência de ambiente, cache ou deploy.
+        if (tipo_item && typeof tipo_item === 'string') {
+            tipo_item = tipo_item.toLowerCase();
+        }
+
+        // Adicionando logs para depuração profunda
+        console.log(`--- DADOS FINAIS PARA INSERIR NO BANCO ---`);
+        console.log(`OS ID: ${ordem_servico_id}, Tipo: ${tipo_item}, Desc: ${descricao}`);
+        console.log(`----------------------------------------`);
+        
         const client = await db.connect();
 
         try {
