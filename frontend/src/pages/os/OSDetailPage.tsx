@@ -25,28 +25,61 @@ interface ItemOS {
   subtotal: number;
 }
 // Interface para o formulário de novo item
+interface Servico { id: number; nome_servico: string; preco_padrao: number; }
+interface Produto { id: number; nome_produto: string; preco_venda: number; }
 type ItemFormData = {
-    descricao: string;
+    tipo: 'servico' | 'produto' | 'manual';
+    servico_id?: number;
+    produto_peca_id?: number;
+    descricao_manual?: string;
     quantidade: number;
     preco_unitario: number;
 }
 
 // ✅ --- Sub-componente para o formulário de adicionar item ---
 const AddItemForm = ({ osId, onAddItem }: { osId: number, onAddItem: () => void }) => {
-    const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<ItemFormData>();
+    const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<ItemFormData>({
+        defaultValues: { tipo: 'servico', quantidade: 1 }
+    });
+    const [servicos, setServicos] = useState<Servico[]>([]);
+    const [produtos, setProdutos] = useState<Produto[]>([]);
+
+    useEffect(() => {
+        api.get('/api/servicos').then(res => setServicos(res.data));
+        api.get('/api/produtos').then(res => setProdutos(res.data));
+    }, []);
+
+    const tipoSelecionado = watch('tipo');
+    const servicoIdSelecionado = watch('servico_id');
+    const produtoIdSelecionado = watch('produto_peca_id');
+
+    useEffect(() => {
+        if (tipoSelecionado === 'servico' && servicoIdSelecionado) {
+            const servico = servicos.find(s => s.id === Number(servicoIdSelecionado));
+            if (servico) setValue('preco_unitario', servico.preco_padrao);
+        }
+    }, [servicoIdSelecionado, tipoSelecionado, servicos, setValue]);
+    
+    useEffect(() => {
+        if (tipoSelecionado === 'produto' && produtoIdSelecionado) {
+            const produto = produtos.find(p => p.id === Number(produtoIdSelecionado));
+            if (produto) setValue('preco_unitario', produto.preco_venda);
+        }
+    }, [produtoIdSelecionado, tipoSelecionado, produtos, setValue]);
 
     const onSubmit: SubmitHandler<ItemFormData> = async (data) => {
         try {
-            await api.post('/api/itens-ordem', {
+            const payload = {
                 ordem_servico_id: osId,
-                descricao: data.descricao,
-                quantidade: data.quantidade,
-                preco_unitario: data.preco_unitario,
-                subtotal: data.quantidade * data.preco_unitario,
-                tipo_item: 'Serviço', // ou ter um seletor para 'Peça'
-            });
-            reset();
-            onAddItem(); // Avisa o componente pai para recarregar os dados
+                quantidade: Number(data.quantidade),
+                preco_unitario: Number(data.preco_unitario),
+                servico_id: data.tipo === 'servico' ? data.servico_id : null,
+                produto_peca_id: data.tipo === 'produto' ? data.produto_peca_id : null,
+                descricao_manual: data.tipo === 'manual' ? data.descricao_manual : null,
+            };
+            await api.post('/api/itens-ordem', payload);
+            reset({ tipo: 'servico', quantidade: 1, preco_unitario: 0 });
+            onAddItem();
         } catch (error) {
             console.error("Erro ao adicionar item:", error);
             alert("Não foi possível adicionar o item.");
@@ -54,26 +87,56 @@ const AddItemForm = ({ osId, onAddItem }: { osId: number, onAddItem: () => void 
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4 flex items-end gap-2 p-4 border-t bg-gray-50">
-            <div className="flex-grow">
-                <label htmlFor="item_descricao" className="text-sm font-medium text-gray-700">Descrição do Item/Serviço</label>
-                <input id="item_descricao" {...register('descricao', { required: true })} placeholder="Ex: Troca de óleo do motor" className="w-full mt-1 p-2 border rounded-md" />
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4 p-4 border-t bg-gray-50 space-y-3">
+            <div className="grid grid-cols-4 gap-3">
+                {/* Seletor de Tipo */}
+                <div className="col-span-1">
+                    <label className="text-sm font-medium">Tipo</label>
+                    <select {...register('tipo')} className="w-full mt-1 p-2 border rounded-md bg-white">
+                        <option value="servico">Serviço</option>
+                        <option value="produto">Peça/Produto</option>
+                        <option value="manual">Item Manual</option>
+                    </select>
+                </div>
+
+                {/* Seletor Dinâmico */}
+                <div className="col-span-3">
+                    <label className="text-sm font-medium">Item</label>
+                    {tipoSelecionado === 'servico' && (
+                        <select {...register('servico_id')} className="w-full mt-1 p-2 border rounded-md bg-white">
+                            <option value="">Selecione um serviço...</option>
+                            {servicos.map(s => <option key={s.id} value={s.id}>{s.nome_servico}</option>)}
+                        </select>
+                    )}
+                    {tipoSelecionado === 'produto' && (
+                         <select {...register('produto_peca_id')} className="w-full mt-1 p-2 border rounded-md bg-white">
+                            <option value="">Selecione uma peça...</option>
+                            {produtos.map(p => <option key={p.id} value={p.id}>{p.nome_produto}</option>)}
+                        </select>
+                    )}
+                    {tipoSelecionado === 'manual' && (
+                        <input {...register('descricao_manual')} placeholder="Descrição do item/serviço manual" className="w-full mt-1 p-2 border rounded-md"/>
+                    )}
+                </div>
             </div>
-             <div className="w-24">
-                <label htmlFor="item_quantidade" className="text-sm font-medium text-gray-700">Qtd.</label>
-                <input id="item_quantidade" {...register('quantidade', { required: true, valueAsNumber: true, min: 1 })} type="number" defaultValue={1} className="w-full mt-1 p-2 border rounded-md" />
+            <div className="grid grid-cols-4 gap-3">
+                <div className="w-full">
+                    <label className="text-sm font-medium">Qtd.</label>
+                    <input {...register('quantidade')} type="number" defaultValue={1} className="w-full mt-1 p-2 border rounded-md" />
+                </div>
+                <div className="w-full">
+                    <label className="text-sm font-medium">Vl. Unit. (R$)</label>
+                    <input {...register('preco_unitario')} type="number" step="0.01" placeholder="0.00" className="w-full mt-1 p-2 border rounded-md" />
+                </div>
+                <div className="col-span-2 flex items-end">
+                    <button type="submit" disabled={isSubmitting} className="h-10 w-full bg-green-600 hover:bg-green-700 text-white rounded-md inline-flex items-center justify-center gap-2 disabled:bg-gray-400">
+                        <PlusCircle size={18} /> {isSubmitting ? 'Adicionando...' : 'Adicionar Item'}
+                    </button>
+                </div>
             </div>
-            <div className="w-40">
-                <label htmlFor="item_preco_unitario" className="text-sm font-medium text-gray-700">Valor Unit. (R$)</label>
-                <input id="item_preco_unitario" {...register('preco_unitario', { required: true, valueAsNumber: true })} type="number" step="0.01" placeholder="150.00" className="w-full mt-1 p-2 border rounded-md" />
-            </div>
-            <button type="submit" disabled={isSubmitting} className="h-10 px-4 bg-green-600 hover:bg-green-700 text-white rounded-md inline-flex items-center gap-2 disabled:bg-gray-400">
-                <PlusCircle size={18} /> {isSubmitting ? 'Adicionando...' : 'Adicionar'}
-            </button>
         </form>
     );
 };
-
 
 // --- Componente Principal da Página ---
 export default function OSDetailPage() {
