@@ -356,12 +356,11 @@ router.get('/visualizar/:token', async (req, res) => {
   }
 });
 
-// ✅ ROTA DE EXPORTAÇÃO DE PDF ATUALIZADA
+// ✅ ROTA DE EXPORTAÇÃO DE PDF REESCRITA E CORRIGIDA
 router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Query principal que une OS, Cliente e Veículo
     const osQuery = `
       SELECT 
         os.*, 
@@ -374,8 +373,18 @@ router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), as
     `;
     const osResult = await db.query(osQuery, [id]);
 
-    // Query para os itens da OS
-    const itensResult = await db.query('SELECT * FROM itens_ordem_servico WHERE ordem_servico_id = $1', [id]);
+    // ✅ CORREÇÃO 1: Usando a query com JOINs para buscar a descrição correta de cada item
+    const itensQuery = `
+        SELECT 
+            ios.quantidade, ios.preco_unitario, ios.subtotal,
+            COALESCE(s.nome_servico, p.nome_produto, ios.descricao_manual) as descricao
+        FROM itens_ordem_servico ios
+        LEFT JOIN servicos s ON ios.servico_id = s.id
+        LEFT JOIN produtos_pecas p ON ios.produto_peca_id = p.id
+        WHERE ios.ordem_servico_id = $1
+        ORDER BY ios.id ASC;
+    `;
+    const itensResult = await db.query(itensQuery, [id]);
 
     if (osResult.rows.length === 0) {
       return res.status(404).json({ error: 'OS não encontrada' });
@@ -390,69 +399,65 @@ router.get('/:id/exportar', checkPermissao(['administrador', 'funcionario']), as
     doc.pipe(res);
 
     // --- Início do Layout do PDF ---
-
-    // Cabeçalho
     doc.fontSize(20).font('Helvetica-Bold').text('Orbe Garage', { align: 'center' });
     doc.fontSize(10).font('Helvetica').text('Ordem de Serviço', { align: 'center' });
     doc.moveDown(2);
 
-    // Informações da OS
     doc.fontSize(12).font('Helvetica-Bold').text(`OS #${os.id}`, { continued: true });
     doc.font('Helvetica').text(` - ${new Date(os.data_entrada).toLocaleDateString('pt-BR')}`, { align: 'right' });
     doc.fontSize(10).fillColor('gray').text(`Status: ${os.status}`);
     doc.moveDown();
 
-    // Dados do Cliente e Veículo (em colunas)
     const yPos = doc.y;
     doc.fontSize(12).font('Helvetica-Bold').text('Dados do Cliente', { width: 250 });
     doc.font('Helvetica').text(os.cliente_nome || 'N/A');
     doc.text(os.cliente_email || 'N/A');
     doc.text(os.cliente_telefone || 'N/A');
 
-    doc.y = yPos; // Volta para a mesma altura para a segunda coluna
+    doc.y = yPos;
     doc.fontSize(12).font('Helvetica-Bold').text('Dados do Veículo', { align: 'right' });
     doc.font('Helvetica').text(`${os.marca || ''} ${os.modelo || ''} ${os.ano || ''}`, { align: 'right' });
     doc.text(`Placa: ${os.placa || 'N/A'}`, { align: 'right' });
     doc.moveDown(2);
 
-    // Descrição principal da OS
     doc.font('Helvetica-Bold').text('Descrição do Problema/Serviço:');
     doc.font('Helvetica').text(os.descricao_problema, { align: 'justify' });
     doc.moveDown(2);
 
-    // Tabela de Itens e Serviços
+    // ✅ CORREÇÃO 2: Layout da tabela atualizado para incluir Quantidade e Vl. Unit.
     doc.font('Helvetica-Bold').text('Itens e Serviços Detalhados:');
     doc.moveDown();
     const tableTop = doc.y;
-    const itemX = 50;
-    const valorX = 450;
+    const descX = 50;
+    const qtdX = 350;
+    const valorUnitX = 420;
+    const subtotalX = 500;
     
-    doc.font('Helvetica-Bold').text('Descrição', itemX, tableTop).text('Valor (R$)', valorX, tableTop, { align: 'right' });
-    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke(); // Linha divisória
+    doc.font('Helvetica-Bold').fontSize(10)
+      .text('Descrição', descX, tableTop)
+      .text('Qtd', qtdX, tableTop, { width: 50, align: 'center' })
+      .text('Vl. Unit.', valorUnitX, tableTop, { width: 70, align: 'right' })
+      .text('Subtotal', subtotalX, tableTop, { width: 70, align: 'right' });
+    doc.moveTo(50, doc.y).lineTo(570, doc.y).stroke();
     
     let currentY = doc.y + 5;
     itens.forEach(item => {
-        doc.font('Helvetica').fontSize(10).text(item.descricao, itemX, currentY, { width: 380 });
-        doc.text(parseFloat(item.subtotal).toFixed(2), valorX, currentY, { align: 'right' });
-        currentY += 20;
+        doc.font('Helvetica').fontSize(10).text(item.descricao, descX, currentY, { width: 280, align: 'left' });
+        doc.text(item.quantidade, qtdX, currentY, { width: 50, align: 'center' });
+        doc.text(parseFloat(item.preco_unitario).toFixed(2), valorUnitX, currentY, { width: 70, align: 'right' });
+        doc.text(parseFloat(item.subtotal).toFixed(2), subtotalX, currentY, { width: 70, align: 'right' });
+        currentY += 20; // Aumenta o espaço para a próxima linha
     });
 
-    doc.y = currentY > doc.y ? currentY : doc.y; // Garante que a posição Y esteja correta
-    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    doc.y = currentY > doc.y ? currentY : doc.y;
+    doc.moveTo(50, doc.y).lineTo(570, doc.y).stroke();
     doc.moveDown();
     
-    // Total
-    doc.fontSize(14).font('Helvetica-Bold').text('Valor Total:', { width: 480, align: 'right' });
-    doc.y -= 16; // Recua um pouco a linha para alinhar o valor
-    doc.text(`R$ ${parseFloat(os.valor_total).toFixed(2)}`, { align: 'right' });
+    doc.fontSize(14).font('Helvetica-Bold').text(`Valor Total: R$ ${parseFloat(os.valor_total).toFixed(2)}`, { align: 'right' });
     doc.moveDown(3);
 
-    // Assinatura
     doc.moveTo(150, doc.y + 30).lineTo(450, doc.y + 30).stroke();
     doc.text('Assinatura do Cliente', { align: 'center' });
-
-
-    // --- Fim do Layout ---
 
     doc.end();
   } catch (error) {
