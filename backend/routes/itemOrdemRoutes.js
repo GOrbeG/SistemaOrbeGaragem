@@ -41,9 +41,7 @@ router.post('/', checkPermissao(['administrador', 'funcionario']),
         // Valida um dos três tipos de item
         body().custom((value, { req }) => {
             const { servico_id, produto_peca_id, descricao_manual } = req.body;
-            if (servico_id || produto_peca_id || descricao_manual) {
-                return true;
-            }
+            if (servico_id || produto_peca_id || descricao_manual) return true;
             throw new Error('É necessário fornecer um serviço, produto ou descrição manual.');
         })
     ],
