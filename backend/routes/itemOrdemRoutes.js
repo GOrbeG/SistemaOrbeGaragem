@@ -5,91 +5,72 @@ const { body, validationResult } = require('express-validator');
 const registrarHistorico = require('../middlewares/logHistorico');
 const checkPermissao = require('../middlewares/checkPermissao');
 
-// Listar todos os itens de uma OS específica
-router.get('/', async (req, res) => {
-  // ✅ CORREÇÃO: Lendo o parâmetro 'ordem_servico_id' que o frontend envia
-  const { ordem_servico_id } = req.query;
-
-  // Garante que um ID foi fornecido
-  if (!ordem_servico_id) {
-    return res.status(400).json({ error: 'ID da Ordem de Serviço é obrigatório.' });
-  }
-
-  try {
-    // ✅ CORREÇÃO: Usando a tabela e coluna corretas
-    const query = 'SELECT * FROM itens_ordem_servico WHERE ordem_servico_id = $1 ORDER BY id ASC';
-    const params = [ordem_servico_id];
-    
-    const result = await db.query(query, params);
-    res.json(result.rows);
-  } catch (error) {
-    console.error("Erro ao buscar itens de ordem:", error);
-    res.status(500).json({ error: 'Erro ao buscar itens de ordem' });
-  }
+// Listar itens de uma OS (agora com JOIN para pegar nomes)
+router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
+    const { ordem_servico_id } = req.query;
+    if (!ordem_servico_id) return res.status(400).json({ error: 'ID da OS é obrigatório.' });
+    try {
+        const query = `
+            SELECT 
+                ios.id,
+                ios.quantidade,
+                ios.preco_unitario,
+                ios.subtotal,
+                -- Pega o nome do serviço, do produto, ou usa a descrição manual
+                COALESCE(s.nome_servico, p.nome_produto, ios.descricao_manual) as descricao
+            FROM itens_ordem_servico ios
+            LEFT JOIN servicos s ON ios.servico_id = s.id
+            LEFT JOIN produtos_pecas p ON ios.produto_peca_id = p.id
+            WHERE ios.ordem_servico_id = $1
+            ORDER BY ios.id ASC;
+        `;
+        const result = await db.query(query, [ordem_servico_id]);
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Erro ao buscar itens:", error);
+        res.status(500).json({ error: 'Erro ao buscar itens' });
+    }
 });
 
-// Criar novo item e ATUALIZAR O TOTAL DA OS
-router.post('/',
-    checkPermissao(['administrador', 'funcionario']),
+// Criar novo item
+router.post('/', checkPermissao(['administrador', 'funcionario']),
     [
-        // ✅ CORREÇÃO: Validação alinhada com o formulário e a tabela
-        body('ordem_servico_id').isInt().withMessage('ID da ordem é obrigatório'),
-        body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
-        body('quantidade').isInt({ gt: 0 }).withMessage('Quantidade deve ser um número maior que zero'),
-        body('preco_unitario').isFloat({ gt: -1 }).withMessage('Preço unitário deve ser numérico'),
-        body('subtotal').isFloat().withMessage('Subtotal deve ser numérico'),
-        body('tipo_item').notEmpty().withMessage('Tipo do item é obrigatório')
+        body('ordem_servico_id').isInt(),
+        body('quantidade').isInt({ gt: 0 }),
+        body('preco_unitario').isFloat({ gt: -1 }),
+        // Valida um dos três tipos de item
+        body().custom((value, { req }) => {
+            const { servico_id, produto_peca_id, descricao_manual } = req.body;
+            if (servico_id || produto_peca_id || descricao_manual) {
+                return true;
+            }
+            throw new Error('É necessário fornecer um serviço, produto ou descrição manual.');
+        })
     ],
     async (req, res) => {
         const erros = validationResult(req);
         if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
-        const { ordem_servico_id, descricao, quantidade, preco_unitario, subtotal } = req.body;
-        let tipo_item = req.body.tipo_item; // Pega o tipo_item separadamente
-
-        // ✅ CORREÇÃO DEFINITIVA: Força o valor a ser minúsculo antes de salvar.
-        // Isso resolve qualquer inconsistência de ambiente, cache ou deploy.
-        if (tipo_item && typeof tipo_item === 'string') {
-            tipo_item = tipo_item.toLowerCase();
-        }
-
-        // Adicionando logs para depuração profunda
-        console.log(`--- DADOS FINAIS PARA INSERIR NO BANCO ---`);
-        console.log(`OS ID: ${ordem_servico_id}, Tipo: ${tipo_item}, Desc: ${descricao}`);
-        console.log(`----------------------------------------`);
-        
+        const { ordem_servico_id, servico_id, produto_peca_id, descricao_manual, quantidade, preco_unitario } = req.body;
+        const subtotal = Number(quantidade) * Number(preco_unitario);
         const client = await db.connect();
 
         try {
             await client.query('BEGIN');
 
-            // ✅ CORREÇÃO: Query de INSERT com a tabela e colunas corretas
-            const insertItemQuery = `
-                INSERT INTO itens_ordem_servico (ordem_servico_id, descricao, quantidade, preco_unitario, subtotal, tipo_item) 
-                VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+            const insertQuery = `
+                INSERT INTO itens_ordem_servico (ordem_servico_id, servico_id, produto_peca_id, descricao_manual, quantidade, preco_unitario, subtotal)
+                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
             `;
-            const newItemResult = await client.query(insertItemQuery, [ordem_servico_id, descricao, quantidade, preco_unitario, subtotal, tipo_item]);
+            const newItem = await client.query(insertQuery, [ordem_servico_id, servico_id || null, produto_peca_id || null, descricao_manual || null, quantidade, preco_unitario, subtotal]);
 
-            // ✅ CORREÇÃO: Recalcula e atualiza o valor_total na OS somando os subtotais
             const updateTotalQuery = `
-                UPDATE ordens_servico
-                SET valor_total = (SELECT SUM(subtotal) FROM itens_ordem_servico WHERE ordem_servico_id = $1)
-                WHERE id = $1;
+                UPDATE ordens_servico SET valor_total = (SELECT SUM(subtotal) FROM itens_ordem_servico WHERE ordem_servico_id = $1) WHERE id = $1;
             `;
             await client.query(updateTotalQuery, [ordem_servico_id]);
 
             await client.query('COMMIT');
-            
-            await registrarHistorico({
-                usuario_id: req.user.id,
-                acao: 'criar',
-                entidade: 'itens_ordem_servico',
-                entidade_id: newItemResult.rows[0].id,
-                dados_novos: newItemResult.rows[0]
-            });
-            
-            res.status(201).json(newItemResult.rows[0]);
-
+            res.status(201).json(newItem.rows[0]);
         } catch (error) {
             await client.query('ROLLBACK');
             console.error("Erro ao criar item:", error);
@@ -104,7 +85,7 @@ router.post('/',
 router.put('/:id',
   checkPermissao(['administrador', 'funcionario']),
   [
-    body('descricao').notEmpty().withMessage('Descrição é obrigatória'),
+    // A validação agora foca nos campos que podem ser editados
     body('quantidade').isInt({ gt: 0 }).withMessage('Quantidade deve ser um número maior que zero'),
     body('preco_unitario').isFloat({ gt: -1 }).withMessage('Preço unitário deve ser numérico'),
   ],
@@ -113,7 +94,7 @@ router.put('/:id',
     if (!erros.isEmpty()) return res.status(400).json({ erros: erros.array() });
 
     const { id } = req.params;
-    const { descricao, quantidade, preco_unitario } = req.body;
+    const { quantidade, preco_unitario } = req.body;
     const subtotal = Number(quantidade) * Number(preco_unitario);
     const client = await db.connect();
 
@@ -128,12 +109,13 @@ router.put('/:id',
         const itemAntes = itemAntesResult.rows[0];
         const { ordem_servico_id } = itemAntes;
 
+        // A query de atualização foca em quantidade e preço, que são os campos editáveis
         const updateQuery = `
             UPDATE itens_ordem_servico 
-            SET descricao = $1, quantidade = $2, preco_unitario = $3, subtotal = $4 
-            WHERE id = $5 RETURNING *
+            SET quantidade = $1, preco_unitario = $2, subtotal = $3 
+            WHERE id = $4 RETURNING *
         `;
-        const updatedItemResult = await client.query(updateQuery, [descricao, quantidade, preco_unitario, subtotal, id]);
+        const updatedItemResult = await client.query(updateQuery, [quantidade, preco_unitario, subtotal, id]);
 
         const updateTotalQuery = `
             UPDATE ordens_servico
