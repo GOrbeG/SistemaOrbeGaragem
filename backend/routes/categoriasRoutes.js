@@ -10,10 +10,10 @@ const router = express.Router();
 router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, res) => {
   try {
     const { tipo } = req.query;
-    let query = 'SELECT * FROM categorias_financeiras ORDER BY nome ASC';
+    let query = 'SELECT * FROM categorias_financeiras ORDER BY nome_categoria ASC';
     const params = [];
     if (tipo) {
-      query = 'SELECT * FROM categorias_financeiras WHERE tipo = $1 ORDER BY nome ASC';
+      query = 'SELECT * FROM categorias_financeiras WHERE tipo = $1 ORDER BY nome_categoria ASC';
       params.push(tipo);
     }
     const { rows } = await db.query(query, params);
