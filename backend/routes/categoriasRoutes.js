@@ -28,7 +28,7 @@ router.get('/', checkPermissao(['administrador', 'funcionario']), async (req, re
 router.post('/',
   checkPermissao(['administrador']),
   [
-    body('nome').notEmpty().withMessage('O nome da categoria é obrigatório.'),
+    body('nome_categoria').notEmpty().withMessage('O nome da categoria é obrigatório.'),
     body('tipo').isIn(['entrada', 'saida']).withMessage('O tipo deve ser "entrada" ou "saida".')
   ],
   async (req, res) => {
