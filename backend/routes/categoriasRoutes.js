@@ -39,7 +39,7 @@ router.post('/',
     const { nome_categoria, tipo } = req.body;
 
     // ✅ CORREÇÃO 2: Padroniza o valor para o formato do banco de dados (Ex: "entrada" -> "Entrada")
-    const tipoPadronizado = tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase();
+    const tipoPadronizado = tipo.toLowerCase() === 'saida' ? 'Saída' : 'Entrada';
 
     try {
       const result = await db.query(
