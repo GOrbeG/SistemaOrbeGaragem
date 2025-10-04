@@ -35,11 +35,11 @@ router.post('/',
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { nome, tipo } = req.body;
+    const { nome_categoria, tipo } = req.body;
     try {
       const result = await db.query(
-        'INSERT INTO categorias_financeiras (nome, tipo) VALUES ($1, $2) RETURNING *',
-        [nome, tipo]
+        'INSERT INTO categorias_financeiras (nome_categoria, tipo) VALUES ($1, $2) RETURNING *',
+        [nome_categoria, tipo]
       );
       res.status(201).json(result.rows[0]);
     } catch (error) {
