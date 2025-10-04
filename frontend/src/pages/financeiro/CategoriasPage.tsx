@@ -4,17 +4,17 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { api } from '@/services/api';
 import { Trash2 } from 'lucide-react';
 
-// Interface para os dados do formulário de nova categoria
+// ✅ CORREÇÃO 1: Interface do formulário atualizada para 'nome_categoria'
 interface CategoriaFormData {
-  nome: string;
+  nome_categoria: string;
   tipo: 'entrada' | 'saida';
 }
 
-// Interface para as categorias que vêm da API
+// ✅ CORREÇÃO 2: Interface das categorias da API atualizada para 'nome_categoria'
 interface Categoria {
   id: number;
-  nome: string;
-  tipo: 'entrada' | 'saida';
+  nome_categoria: string;
+  tipo: 'Entrada' | 'Saída'; // A API retorna capitalizado
 }
 
 export default function CategoriasPage() {
@@ -57,8 +57,8 @@ export default function CategoriasPage() {
     }
   };
 
-  const categoriasEntrada = categorias.filter(c => c.tipo === 'entrada');
-  const categoriasSaida = categorias.filter(c => c.tipo === 'saida');
+  const categoriasEntrada = categorias.filter(c => c.tipo === 'Entrada');
+  const categoriasSaida = categorias.filter(c => c.tipo === 'Saída');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -67,7 +67,7 @@ export default function CategoriasPage() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-4">Nova Categoria</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <input {...register('nome', { required: true })} placeholder="Nome da Categoria" className="w-full p-2 border rounded" />
+            <input {...register('nome_categoria', { required: true })} placeholder="Nome da Categoria" className="w-full p-2 border rounded" />
             <div className="space-y-2">
                 <p className="text-sm font-medium">Tipo:</p>
                 <div className="flex gap-4">
@@ -97,7 +97,7 @@ export default function CategoriasPage() {
               <ul className="space-y-2">
                 {categoriasEntrada.map(cat => (
                   <li key={cat.id} className="flex justify-between items-center p-2 rounded hover:bg-gray-100">
-                    <span>{cat.nome}</span>
+                    <span>{cat.nome_categoria}</span>
                     <button onClick={() => handleDelete(cat.id)} className="text-red-500 hover:text-red-700"><Trash2 size={16} /></button>
                   </li>
                 ))}
@@ -109,7 +109,7 @@ export default function CategoriasPage() {
               <ul className="space-y-2">
                 {categoriasSaida.map(cat => (
                   <li key={cat.id} className="flex justify-between items-center p-2 rounded hover:bg-gray-100">
-                    <span>{cat.nome}</span>
+                    <span>{cat.nome_categoria}</span>
                     <button onClick={() => handleDelete(cat.id)} className="text-red-500 hover:text-red-700"><Trash2 size={16} /></button>
                   </li>
                 ))}
