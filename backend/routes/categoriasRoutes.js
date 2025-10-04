@@ -29,22 +29,27 @@ router.post('/',
   checkPermissao(['administrador']),
   [
     body('nome_categoria').notEmpty().withMessage('O nome da categoria é obrigatório.'),
-    body('tipo').isIn(['entrada', 'saida']).withMessage('O tipo deve ser "entrada" ou "saida".')
+    // ✅ CORREÇÃO 1: A validação agora aceita tanto maiúsculas quanto minúsculas
+    body('tipo').isIn(['Entrada', 'Saída', 'entrada', 'saida']).withMessage('O tipo deve ser "Entrada" ou "Saída".')
   ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     const { nome_categoria, tipo } = req.body;
+
+    // ✅ CORREÇÃO 2: Padroniza o valor para o formato do banco de dados (Ex: "entrada" -> "Entrada")
+    const tipoPadronizado = tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase();
+
     try {
       const result = await db.query(
         'INSERT INTO categorias_financeiras (nome_categoria, tipo) VALUES ($1, $2) RETURNING *',
-        [nome_categoria, tipo]
+        [nome_categoria, tipoPadronizado] // Usa a variável padronizada
       );
       res.status(201).json(result.rows[0]);
     } catch (error) {
       console.error("Erro ao criar categoria:", error);
-      if (error.code === '23505') { // Erro de nome único duplicado
+      if (error.code === '23505') {
         return res.status(409).json({ error: 'Já existe uma categoria com este nome.' });
       }
       res.status(500).json({ error: 'Erro ao criar categoria' });
