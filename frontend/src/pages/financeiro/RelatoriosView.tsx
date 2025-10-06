@@ -11,7 +11,7 @@ interface ResumoData {
   lucro_prejuizo: number;
 }
 interface CategoriaData {
-    nome: string;
+    nome_categoria: string;
     total: number;
 }
 interface DistribuicaoData {
@@ -84,7 +84,7 @@ export default function RelatoriosView() {
                     <h3 className="text-xl font-bold mb-4">Receitas por Categoria</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
-                            <Pie data={distribuicao.entradas} dataKey="total" nameKey="nome" cx="50%" cy="50%" outerRadius={80} label>
+                            <Pie data={distribuicao.entradas} dataKey="total" nameKey="nome_categoria" cx="50%" cy="50%" outerRadius={80} label>
                                 {/* ✅ MUDANÇA: Removido 'entry' e adicionado tipo para 'index' */}
                                 {distribuicao.entradas.map((_, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                             </Pie>
@@ -97,7 +97,7 @@ export default function RelatoriosView() {
                     <h3 className="text-xl font-bold mb-4">Despesas por Categoria</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
-                            <Pie data={distribuicao.saidas} dataKey="total" nameKey="nome" cx="50%" cy="50%" outerRadius={80} label>
+                            <Pie data={distribuicao.saidas} dataKey="total" nameKey="nome_categoria" cx="50%" cy="50%" outerRadius={80} label>
                                 {/* ✅ MUDANÇA: Removido 'entry' e adicionado tipo para 'index' */}
                                 {distribuicao.saidas.map((_, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                             </Pie>
