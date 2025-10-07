@@ -34,16 +34,27 @@ export default function CategoriasPage() {
     fetchCategorias();
   }, []);
 
-  const onSubmit: SubmitHandler<CategoriaFormData> = async (data) => {
-    try {
-      await api.post('/api/categorias-financeiras', data);
-      alert('Categoria criada com sucesso!');
-      reset(); // Limpa o formulário
-      fetchCategorias(); // Atualiza a lista
-    } catch (error: any) {
-      alert(error.response?.data?.error || 'Não foi possível criar a categoria.');
-    }
-  };
+  // ✅ LÓGICA DE 'onSubmit' ATUALIZADA PARA MOSTRAR O ERRO REAL
+    const onSubmit: SubmitHandler<CategoriaFormData> = async (data) => {
+      try {
+        await api.post('/api/categorias-financeiras', data);
+        alert('Categoria criada com sucesso!');
+        reset();
+        fetchCategorias();
+      } catch (error: any) {
+        console.error("Erro detalhado da API:", error.response?.data); // Loga o erro completo no console
+        
+        // Tenta extrair a mensagem de erro específica do express-validator
+        const validationErrors = error.response?.data?.errors;
+        if (validationErrors && Array.isArray(validationErrors) && validationErrors.length > 0) {
+          const errorMessages = validationErrors.map((err: any) => err.msg).join('\n');
+          alert(`Erro de validação:\n\n${errorMessages}`);
+        } else {
+          // Se não for um erro de validação, mostra a mensagem padrão
+          alert(error.response?.data?.error || 'Não foi possível criar a categoria.');
+        }
+      }
+    };
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir esta categoria? Ela não pode estar sendo usada em nenhuma transação.')) {
