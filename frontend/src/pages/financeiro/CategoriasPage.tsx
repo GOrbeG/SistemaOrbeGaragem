@@ -14,7 +14,7 @@ interface CategoriaFormData {
 interface Categoria {
   id: number;
   nome_categoria: string;
-  tipo: 'Entrada' | 'Saída'; // A API retorna capitalizado
+  tipo: 'Entrada' | 'Saida'; // A API retorna capitalizado
 }
 
 export default function CategoriasPage() {
@@ -69,7 +69,7 @@ export default function CategoriasPage() {
   };
 
   const categoriasEntrada = categorias.filter(c => c.tipo === 'Entrada');
-  const categoriasSaida = categorias.filter(c => c.tipo === 'Saída');
+  const categoriasSaida = categorias.filter(c => c.tipo === 'Saida');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
