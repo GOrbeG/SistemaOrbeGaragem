@@ -30,7 +30,7 @@ router.post('/',
   [
     body('nome_categoria').notEmpty().withMessage('O nome da categoria é obrigatório.'),
     // ✅ CORREÇÃO 1: A validação agora aceita tanto maiúsculas quanto minúsculas
-    body('tipo').isIn(['Entrada', 'Saída', 'entrada', 'saída']).withMessage('O tipo deve ser "Entrada" ou "Saída".')
+    body('tipo').isIn(['Entrada', 'Saída', 'entrada', 'saida']).withMessage('O tipo deve ser "Entrada" ou "Saída".')
   ],
   async (req, res) => {
     const errors = validationResult(req);
