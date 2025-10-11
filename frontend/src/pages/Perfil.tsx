@@ -1,47 +1,76 @@
 // src/pages/Perfil.tsx
 
-// Passo 1: Importar o useState
-import { useState } from "react"; 
+import { useState, useEffect } from "react"; 
+import { useAuth } from "@/contexts/AuthContext"; // 1. Importe nosso hook de autenticação!
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"; // Corrigido o import para minúsculo 'card'
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, User } from "lucide-react";
 
-// Dados iniciais de exemplo. No futuro, isso virá de uma API.
-const initialUserData = {
-  name: "Guilherme Orbe",
-  email: "guilherme@orbegarage.com",
-  role: "Mecânico Chefe",
-  phone: "(55) 99123-4567",
-  address: "Rua das Válvulas, 123 - Bairro Pistão, Santa Maria - RS",
-  avatarUrl: "https://github.com/shadcn.png",
-};
+// Não precisamos mais de dados "fake" aqui!
 
 export default function Perfil() {
-  // Passo 2: Criar os estados para os dados do usuário
-  const [userData, setUserData] = useState(initialUserData);
-  const [isEditing, setIsEditing] = useState(false);
+  // 2. Chame o hook para pegar os dados do usuário e a função de login
+  const { user, login } = useAuth();
 
-  // Estados para o formulário de senha
+  // 3. Crie um estado local para os campos editáveis do formulário.
+  // Isso é uma boa prática para não alterar o estado global a cada tecla digitada.
+  const [formData, setFormData] = useState({
+    phone: "",
+    address: "",
+  });
+
+  // Este useEffect "sincroniza" o formulário com os dados do usuário quando eles carregam
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        phone: user.phone || "", // Usa o dado do usuário ou uma string vazia
+        address: user.address || "",
+      });
+    }
+  }, [user]); // Esta função roda toda vez que o objeto 'user' do contexto mudar.
+
+  // =======================================================================
+  // SIMULAÇÃO DE LOGIN (TEMPORÁRIO)
+  // Como ainda não temos uma tela de login, este código simula um login
+  // para que a página tenha dados para exibir durante o desenvolvimento.
+  useEffect(() => {
+    if (!user) {
+      console.log("Nenhum usuário logado. Simulando login para testes...");
+      const testUser = {
+        id: "1",
+        name: "Guilherme Orbe (Real)",
+        email: "guilherme@orbegarage.com",
+        role: "Gerente de Projetos",
+        phone: "(55) 98765-4321",
+        address: "Avenida do Código, 404, Santa Maria - RS",
+        avatarUrl: "https://github.com/GOrbeG.png", // Sua foto real do GitHub :)
+      };
+      login(testUser);
+    }
+  }, [user, login]);
+  // =======================================================================
+
+  const [isEditing, setIsEditing] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Passo 3: Criar as funções de manipulação (handlers)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setUserData(prevData => ({ ...prevData, [id]: value }));
+    setFormData(prevData => ({ ...prevData, [id]: value }));
   };
 
   const handleSaveChanges = () => {
-    // Aqui, no futuro, você faria a chamada para a API para salvar os dados
-    console.log("Salvando dados:", userData);
-    setIsEditing(false); // Sai do modo de edição após salvar
+    // No futuro, aqui você chamaria a API para salvar os novos dados em 'formData'
+    console.log("Salvando dados:", formData);
+    // Opcional: Atualizar o contexto global também, se a API retornar sucesso.
+    setIsEditing(false); 
   };
   
-  const handleChangePassword = () => {
+ const handleChangePassword = () => {
     // Lógica de validação
     if (newPassword !== confirmPassword) {
       alert("A nova senha e a confirmação não são iguais!");
@@ -63,9 +92,18 @@ export default function Perfil() {
     setConfirmPassword("");
   };
 
+  // 4. Se o usuário ainda não carregou do contexto, mostre uma tela de carregamento.
+  if (!user) {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-xl font-semibold">Carregando dados do perfil...</h1>
+      </div>
+    );
+  }
+
+  // 5. O componente agora usa 'user' para dados fixos e 'formData' para dados editáveis.
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -75,7 +113,6 @@ export default function Perfil() {
                 Visualize e edite suas informações pessoais e profissionais.
               </CardDescription>
             </div>
-            {/* O botão agora alterna o modo de edição */}
             {isEditing ? (
               <Button onClick={handleSaveChanges}>Salvar Alterações</Button>
             ) : (
@@ -86,47 +123,42 @@ export default function Perfil() {
           </div>
         </CardHeader>
         <CardContent className="grid md:grid-cols-3 gap-6">
-          
           <div className="md:col-span-1 flex flex-col items-center gap-4">
             <Avatar className="h-32 w-32">
-              <AvatarImage src={userData.avatarUrl} alt="Foto de Perfil" />
-              <AvatarFallback>
-                <User className="h-16 w-16" />
-              </AvatarFallback>
+              <AvatarImage src={user.avatarUrl} alt="Foto de Perfil" /> {/* DADO REAL */}
+              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <Button variant="outline">
               <Pencil className="mr-2 h-4 w-4" /> Alterar Foto
             </Button>
           </div>
-
           <div className="md:col-span-2 grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nome Completo</Label>
-                <Input id="name" value={userData.name} disabled />
+                <Input id="name" value={user.name} disabled /> {/* DADO REAL */}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" value={userData.email} disabled />
+                <Input id="email" value={user.email} disabled /> {/* DADO REAL */}
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="role">Cargo</Label>
-              <Input id="role" value={userData.role} disabled />
+              <Input id="role" value={user.role} disabled /> {/* DADO REAL */}
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Telefone</Label>
-              {/* Agora os inputs são controlados pelo estado */}
-              <Input id="phone" value={userData.phone} onChange={handleInputChange} disabled={!isEditing} />
+              <Input id="phone" value={formData.phone} onChange={handleInputChange} disabled={!isEditing} /> {/* Dado do formulário */}
             </div>
             <div className="space-y-2">
               <Label htmlFor="address">Endereço</Label>
-              <Input id="address" value={userData.address} onChange={handleInputChange} disabled={!isEditing} />
+              <Input id="address" value={formData.address} onChange={handleInputChange} disabled={!isEditing} /> {/* Dado do formulário */}
             </div>
           </div>
         </CardContent>
       </Card>
-
+      {/* O Card de Segurança continua igual */}
       <Card>
         <CardHeader>
           <CardTitle>Segurança</CardTitle>
