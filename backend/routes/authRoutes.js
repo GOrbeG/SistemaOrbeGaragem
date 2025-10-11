@@ -18,7 +18,7 @@ const corsOptions = {
 // Habilita explicitamente a "sondagem" de segurança (preflight) para a rota de login
 router.options('/login', cors(corsOptions)); 
 
-router.post('/login', cors(corsOptions), // Garante o CORS na rota principal também
+router.post('/login', cors(corsOptions),
   [
     body('email').isEmail().withMessage('E-mail inválido'),
     body('senha').notEmpty().withMessage('Senha é obrigatória')
@@ -30,7 +30,24 @@ router.post('/login', cors(corsOptions), // Garante o CORS na rota principal tam
     const { email, senha } = req.body;
 
     try {
-      const result = await db.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+      // ✅ NOVA QUERY COM LEFT JOIN E COALESCE
+      const query = `
+        SELECT
+          u.id,
+          u.nome,
+          u.email,
+          u.senha,
+          u.role,
+          u.avatar_url,
+          COALESCE(u.telefone, c.telefone) AS telefone,
+          COALESCE(u.endereco, CONCAT_WS(', ', c.logradouro, c.numero, c.bairro, c.cidade, c.estado)) AS endereco
+        FROM usuarios u
+        LEFT JOIN clientes c ON u.id = c.usuario_id
+        WHERE u.email = $1;
+      `;
+      
+      const result = await db.query(query, [email]);
+      
       if (result.rows.length === 0) {
         return res.status(401).json({ error: 'Credenciais inválidas' });
       }
@@ -42,16 +59,24 @@ router.post('/login', cors(corsOptions), // Garante o CORS na rota principal tam
       }
 
       const token = jwt.sign(
-        {
-          id: usuario.id,
-          nome: usuario.nome,
-          role: usuario.role
-        },
+        { id: usuario.id, nome: usuario.nome, role: usuario.role },
         process.env.JWT_SECRET,
         { expiresIn: '12h' }
       );
 
-      res.json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, role: usuario.role } });
+      // ✅ OBJETO ENVIADO PARA O FRONTEND AGORA ESTÁ COMPLETO E CORRETO
+      const usuarioParaFrontend = {
+        id: usuario.id,
+        name: usuario.nome, // Frontend espera 'name'
+        email: usuario.email,
+        role: usuario.role,
+        phone: usuario.telefone, // Vem da coluna unificada 'telefone'
+        address: usuario.endereco, // Vem da coluna unificada 'endereco'
+        avatarUrl: usuario.avatar_url
+      };
+
+      res.json({ token, usuario: usuarioParaFrontend });
+
     } catch (error) {
       console.error("ERRO NO LOGIN:", error);
       res.status(500).json({ error: 'Erro interno ao fazer login' });
