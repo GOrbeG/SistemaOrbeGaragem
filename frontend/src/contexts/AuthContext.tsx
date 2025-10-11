@@ -32,10 +32,18 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(() => {
-    // Tenta carregar dados do usuário do localStorage para manter o login
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      return JSON.parse(storedUser);
+      try {
+        // Tenta converter o texto em objeto
+        return JSON.parse(storedUser);
+      } catch (error) {
+        // Se falhar (texto corrompido), limpa o localStorage e retorna null
+        console.error("Falha ao analisar dados do usuário no localStorage:", error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token'); // Limpa o token também por segurança
+        return null;
+      }
     }
     return null;
   });
