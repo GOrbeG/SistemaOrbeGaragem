@@ -1,57 +1,32 @@
 // src/pages/Perfil.tsx
 
 import { useState, useEffect } from "react"; 
-import { useAuth } from "@/contexts/AuthContext"; // 1. Importe nosso hook de autenticação!
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"; // Corrigido o import para minúsculo 'card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil } from "lucide-react";
-
-// Não precisamos mais de dados "fake" aqui!
+import api from '@/lib/api';
 
 export default function Perfil() {
-  // 2. Chame o hook para pegar os dados do usuário e a função de login
-  const { user, login } = useAuth();
+  // ✅ CORREÇÃO: Removemos 'login' pois não está sendo usado neste componente.
+  const { user } = useAuth();
 
-  // 3. Crie um estado local para os campos editáveis do formulário.
-  // Isso é uma boa prática para não alterar o estado global a cada tecla digitada.
   const [formData, setFormData] = useState({
     phone: "",
     address: "",
   });
 
-  // Este useEffect "sincroniza" o formulário com os dados do usuário quando eles carregam
   useEffect(() => {
     if (user) {
       setFormData({
-        phone: user.phone || "", // Usa o dado do usuário ou uma string vazia
+        phone: user.phone || "",
         address: user.address || "",
       });
     }
-  }, [user]); // Esta função roda toda vez que o objeto 'user' do contexto mudar.
-
-  // =======================================================================
-  // SIMULAÇÃO DE LOGIN (TEMPORÁRIO)
-  // Como ainda não temos uma tela de login, este código simula um login
-  // para que a página tenha dados para exibir durante o desenvolvimento.
-  useEffect(() => {
-    if (!user) {
-      console.log("Nenhum usuário logado. Simulando login para testes...");
-      const testUser = {
-        id: "1",
-        name: "Guilherme Orbe (Real)",
-        email: "guilherme@orbegarage.com",
-        role: "Gerente de Projetos",
-        phone: "(55) 98765-4321",
-        address: "Avenida do Código, 404, Santa Maria - RS",
-        avatarUrl: "https://github.com/GOrbeG.png", // Sua foto real do GitHub :)
-      };
-      login(testUser);
-    }
-  }, [user, login]);
-  // =======================================================================
+  }, [user]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -63,15 +38,26 @@ export default function Perfil() {
     setFormData(prevData => ({ ...prevData, [id]: value }));
   };
 
-  const handleSaveChanges = () => {
-    // No futuro, aqui você chamaria a API para salvar os novos dados em 'formData'
-    console.log("Salvando dados:", formData);
-    // Opcional: Atualizar o contexto global também, se a API retornar sucesso.
-    setIsEditing(false); 
+  const handleSaveChanges = async () => {
+    // ✅ CORREÇÃO: Adicionamos a guarda para garantir que 'user' não é null.
+    if (!user) return; 
+
+    try {
+      // ✅ CORREÇÃO: Removemos a variável 'response' que não era usada.
+      await api.put(`/users/profile/${user.id}`, formData);
+
+      alert("Perfil atualizado com sucesso!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Erro ao atualizar o perfil:", error);
+      alert("Não foi possível atualizar o perfil. Tente novamente.");
+    }
   };
   
- const handleChangePassword = () => {
-    // Lógica de validação
+  const handleChangePassword = async () => {
+    // ✅ CORREÇÃO: Adicionamos a guarda aqui também.
+    if (!user) return;
+
     if (newPassword !== confirmPassword) {
       alert("A nova senha e a confirmação não são iguais!");
       return;
@@ -80,19 +66,21 @@ export default function Perfil() {
       alert("Por favor, preencha todos os campos de senha.");
       return;
     }
-    
-    // Aqui, no futuro, você faria a chamada para a API
-    console.log("Alterando senha...");
-    console.log("Senha Atual:", currentPassword);
-    console.log("Nova Senha:", newPassword);
 
-    // Limpar campos após a tentativa
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    try {
+      await api.put(`/users/password/${user.id}`, { currentPassword, newPassword });
+
+      alert("Senha alterada com sucesso!");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      console.error("Erro ao alterar a senha:", error);
+      alert("Não foi possível alterar a senha. Verifique sua senha atual.");
+    }
   };
 
-  // 4. Se o usuário ainda não carregou do contexto, mostre uma tela de carregamento.
+  // Esta guarda principal continua sendo muito importante para o JSX
   if (!user) {
     return (
       <div className="p-8 text-center">
@@ -101,9 +89,9 @@ export default function Perfil() {
     );
   }
 
-  // 5. O componente agora usa 'user' para dados fixos e 'formData' para dados editáveis.
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="p-4 sm-p-6 lg:p-8 space-y-6">
+      {/* O restante do seu JSX permanece exatamente o mesmo, pois já estava correto */}
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -125,7 +113,7 @@ export default function Perfil() {
         <CardContent className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-1 flex flex-col items-center gap-4">
             <Avatar className="h-32 w-32">
-              <AvatarImage src={user.avatarUrl} alt="Foto de Perfil" /> {/* DADO REAL */}
+              <AvatarImage src={user.avatarUrl} alt="Foto de Perfil" />
               <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <Button variant="outline">
@@ -133,32 +121,32 @@ export default function Perfil() {
             </Button>
           </div>
           <div className="md:col-span-2 grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
-                <Input id="name" value={user.name} disabled /> {/* DADO REAL */}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" value={user.email} disabled /> {/* DADO REAL */}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Cargo</Label>
-              <Input id="role" value={user.role} disabled /> {/* DADO REAL */}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
-              <Input id="phone" value={formData.phone} onChange={handleInputChange} disabled={!isEditing} /> {/* Dado do formulário */}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="address">Endereço</Label>
-              <Input id="address" value={formData.address} onChange={handleInputChange} disabled={!isEditing} /> {/* Dado do formulário */}
-            </div>
+            {/* ...inputs... */}
+             <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2">
+                 <Label htmlFor="name">Nome Completo</Label>
+                 <Input id="name" value={user.name} disabled />
+               </div>
+               <div className="space-y-2">
+                 <Label htmlFor="email">Email</Label>
+                 <Input id="email" value={user.email} disabled />
+               </div>
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="role">Cargo</Label>
+               <Input id="role" value={user.role} disabled />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="phone">Telefone</Label>
+               <Input id="phone" value={formData.phone} onChange={handleInputChange} disabled={!isEditing} />
+             </div>
+             <div className="space-y-2">
+               <Label htmlFor="address">Endereço</Label>
+               <Input id="address" value={formData.address} onChange={handleInputChange} disabled={!isEditing} />
+             </div>
           </div>
         </CardContent>
       </Card>
-      {/* O Card de Segurança continua igual */}
       <Card>
         <CardHeader>
           <CardTitle>Segurança</CardTitle>
@@ -182,7 +170,6 @@ export default function Perfil() {
             </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }
