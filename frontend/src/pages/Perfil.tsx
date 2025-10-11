@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"; // Corrigido o import para minúsculo 'card'
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, User } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 // Não precisamos mais de dados "fake" aqui!
 
